@@ -1,0 +1,711 @@
+<!DOCTYPE html>
+<html lang='en'>
+<head>
+<meta charset='UTF-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=5.0'>
+<meta name='mobile-web-app-capable' content='yes'>
+<meta name='apple-mobile-web-app-capable' content='yes'>
+<title>AFACR Revision and Practice System</title>
+<style>
+:root {
+    --bg:#eef2f7; --card:#ffffff; --text:#1a1d23; --primary:#1e40af; --primary-dark:#1e3a8a;
+    --accent:#dbeafe; --border:#e2e8f0; --tip-bg:#fef3c7; --tip-border:#f59e0b;
+    --success:#10b981; --success-bg:#d1fae5; --danger:#ef4444; --danger-bg:#fee2e2;
+    --sidebar-bg:#ffffff; --purple:#8b5cf6; --purple-bg:#ede9fe;
+    --gradient:linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
+}
+[data-theme="dark"] {
+    --bg:#0f172a; --card:#1e293b; --text:#e2e8f0; --primary:#60a5fa; --primary-dark:#3b82f6;
+    --accent:#1e3a5f; --border:#334155; --tip-bg:#3f2e17; --tip-border:#f59e0b;
+    --success:#34d399; --success-bg:#064e3b; --danger:#f87171; --danger-bg:#7f1d1d;
+    --sidebar-bg:#1e293b; --purple:#a78bfa; --purple-bg:#4c1d95;
+    --gradient:linear-gradient(135deg, #1e3a8a 0%, #1e40af 100%);
+}
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+html, body { overflow-x: hidden; }
+body { font-family: 'Segoe UI', Arial, sans-serif; background: var(--bg); margin:0; color: var(--text); font-size: var(--font-size, 15px); transition: background 0.3s; -webkit-text-size-adjust: 100%; }
+header { background: var(--gradient); color: white; padding: 14px 18px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.15); position: sticky; top: 0; z-index: 100; }
+.header-left { display: flex; align-items: center; gap: 12px; flex: 1; min-width: 0; }
+.hamburger { display: none; background: rgba(255,255,255,0.2); border: none; color: white; width: 44px; height: 44px; border-radius: 8px; cursor: pointer; font-size: 22px; flex-shrink: 0; }
+.header-info { min-width: 0; }
+.header-info h1 { margin:0; font-size: 20px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.header-info .prepared { font-size: 11px; opacity: 0.9; margin-top: 3px; }
+.header-info .prepared a { color: #ffd700; text-decoration: none; }
+.controls { display: flex; gap: 6px; flex-wrap: wrap; }
+.controls button { padding: 8px 12px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.3); background: rgba(255,255,255,0.15); color: white; cursor: pointer; font-size: 13px; font-weight: 600; min-height: 40px; touch-action: manipulation; }
+.controls button:active { background: rgba(255,255,255,0.35); }
+.layout { display: grid; grid-template-columns: 300px 1fr; gap: 16px; max-width: 1400px; margin: 16px auto; padding: 0 16px; }
+.sidebar { background: var(--sidebar-bg); border-radius: 14px; padding: 14px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); height: max-content; position: sticky; top: 90px; max-height: calc(100vh - 110px); overflow-y: auto; -webkit-overflow-scrolling: touch; }
+.main { background: var(--card); border-radius: 14px; padding: 20px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); min-height: 500px; }
+.section-title { font-weight: 700; margin: 14px 0 6px; color: var(--primary); font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; }
+.navbtn { display: block; width: 100%; text-align: left; margin: 5px 0; padding: 12px 14px; border: 1px solid var(--border); background: var(--card); border-radius: 8px; cursor: pointer; font-size: 13px; color: var(--text); font-weight: 500; min-height: 44px; touch-action: manipulation; }
+.navbtn:active { background: var(--accent); }
+.navbtn.done { border-color: var(--success); background: var(--success-bg); font-weight: 600; }
+.navbtn.section-test { background: var(--primary); color: white; font-weight: 700; margin-top: 6px; }
+.navbtn.special { background: var(--purple); color: white; font-weight: 700; }
+.badge { display: inline-block; background: var(--accent); color: var(--primary); padding: 5px 10px; border-radius: 20px; font-weight: 600; font-size: 12px; margin: 3px 3px 3px 0; }
+.badge.success { background: var(--success-bg); color: var(--success); }
+.badge.purple { background: var(--purple-bg); color: var(--purple); }
+h2 { color: var(--primary); margin-top: 0; font-weight: 700; font-size: 22px; }
+h3 { color: var(--primary); margin-bottom: 6px; font-weight: 600; font-size: 17px; }
+.card { border: 1px solid var(--border); background: var(--card); border-radius: 12px; padding: 16px; margin: 12px 0; }
+.card.gradient { background: var(--gradient); color: white; border: none; }
+.card.gradient h3, .card.gradient h2 { color: white; }
+.lesson { line-height: 1.7; word-wrap: break-word; }
+.lesson table { border-collapse: collapse; margin: 10px 0; width: 100%; font-size: 13px; }
+.lesson th, .lesson td { border: 1px solid var(--border); padding: 6px; text-align: left; }
+.lesson th { background: var(--accent); color: var(--primary); font-weight: 700; }
+.tip { border-left: 4px solid var(--tip-border); background: var(--tip-bg); padding: 12px; border-radius: 8px; margin-top: 12px; }
+.actions { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 16px; }
+button.act { padding: 12px 18px; border: 0; border-radius: 8px; font-weight: 700; cursor: pointer; font-size: 14px; min-height: 44px; touch-action: manipulation; }
+button.act:active { transform: scale(0.98); }
+button.act:disabled { opacity: 0.5; cursor: not-allowed; }
+.primary { background: var(--primary); color: white; }
+.secondary { background: #64748b; color: white; }
+.success { background: var(--success); color: white; }
+.warning { background: #f59e0b; color: white; }
+.danger { background: var(--danger); color: white; }
+.option { display: block; width: 100%; text-align: left; padding: 14px; margin: 10px 0; border: 2px solid var(--border); border-radius: 10px; background: var(--card); cursor: pointer; font-size: 15px; color: var(--text); font-weight: 500; min-height: 50px; touch-action: manipulation; }
+.option:active:not(:disabled) { background: var(--accent); }
+.option.correct { background: var(--success-bg) !important; border-color: var(--success); font-weight: 600; }
+.option.incorrect { background: var(--danger-bg) !important; border-color: var(--danger); font-weight: 600; }
+.feedback { padding: 14px; border-radius: 10px; margin-top: 12px; display: none; line-height: 1.6; }
+.feedback.good { display: block; background: var(--success-bg); border: 2px solid var(--success); }
+.feedback.bad { display: block; background: var(--danger-bg); border: 2px solid var(--danger); }
+.working { background: var(--accent); border-left: 4px solid var(--primary); padding: 12px; border-radius: 8px; margin-top: 10px; font-size: 14px; line-height: 1.6; }
+.progress { height: 10px; background: var(--border); border-radius: 30px; overflow: hidden; margin: 8px 0; }
+.bar { height: 100%; background: var(--success); width: 0%; transition: width 0.5s; }
+.qmeta { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; margin-bottom: 12px; padding: 10px 12px; background: var(--accent); border-radius: 10px; }
+.bookmark-btn { background: transparent; border: 2px solid var(--border); border-radius: 8px; padding: 8px 14px; cursor: pointer; color: var(--text); font-weight: 600; min-height: 40px; touch-action: manipulation; }
+.bookmark-btn.on { background: #fbbf24; color: #78350f; border-color: #fbbf24; }
+.qpalette { display: grid; grid-template-columns: repeat(auto-fill, minmax(44px, 1fr)); gap: 6px; padding: 12px; background: var(--accent); border-radius: 10px; margin: 10px 0; max-height: 200px; overflow-y: auto; -webkit-overflow-scrolling: touch; }
+.qnum { padding: 10px 4px; text-align: center; border-radius: 8px; cursor: pointer; font-weight: 700; font-size: 14px; background: var(--card); border: 2px solid var(--border); min-height: 44px; display: flex; align-items: center; justify-content: center; touch-action: manipulation; }
+.qnum:active { transform: scale(0.95); }
+.qnum.current { background: var(--primary); color: white; border-color: var(--primary-dark); }
+.qnum.correct { background: var(--success-bg); border-color: var(--success); color: var(--success); }
+.qnum.incorrect { background: var(--danger-bg); border-color: var(--danger); color: var(--danger); }
+.qnum.answered { border-width: 3px; }
+.qnav { display: flex; gap: 8px; justify-content: space-between; margin-top: 14px; align-items: center; flex-wrap: wrap; }
+.qnav-left, .qnav-right { display: flex; gap: 6px; flex-wrap: wrap; }
+.modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 1000; align-items: flex-start; justify-content: center; padding: 15px; overflow-y: auto; -webkit-overflow-scrolling: touch; }
+.modal.on { display: flex; }
+.modal-content { background: var(--card); border-radius: 14px; padding: 20px; max-width: 750px; width: 100%; max-height: 90vh; overflow-y: auto; margin: auto; -webkit-overflow-scrolling: touch; }
+.close { float: right; cursor: pointer; font-size: 26px; color: var(--text); background: none; border: none; font-weight: bold; padding: 4px 12px; }
+.dashboard-card { display: inline-block; width: calc(50% - 12px); margin: 5px; padding: 16px; background: var(--accent); border-radius: 12px; vertical-align: top; }
+.stat-num { font-size: 28px; font-weight: 800; color: var(--primary); }
+.stat-label { font-size: 12px; color: var(--text); opacity: 0.8; margin-top: 4px; }
+.diff-selector { display: flex; gap: 8px; margin: 12px 0; flex-wrap: wrap; }
+.diff-selector button { padding: 10px 16px; border: 2px solid var(--border); background: var(--card); border-radius: 8px; cursor: pointer; color: var(--text); font-weight: 600; min-height: 44px; touch-action: manipulation; }
+.diff-selector button.active { background: var(--primary); color: white; border-color: var(--primary); }
+.matching-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 15px 0; }
+.match-col { background: var(--accent); padding: 12px; border-radius: 10px; }
+.match-col h4 { margin-top: 0; }
+.match-item { padding: 12px; margin: 7px 0; background: var(--card); border-radius: 8px; cursor: pointer; border: 2px solid var(--border); font-size: 14px; font-weight: 500; touch-action: manipulation; user-select: none; -webkit-user-select: none; }
+.match-item.selected { background: var(--purple-bg); border-color: var(--purple); box-shadow: 0 0 0 3px rgba(139,92,246,0.3); }
+.match-item.used { opacity: 0.35; pointer-events: none; }
+.match-slot { padding: 12px; margin: 7px 0; background: var(--card); border-radius: 8px; border: 2px dashed var(--border); min-height: 46px; font-size: 14px; cursor: pointer; touch-action: manipulation; }
+.match-slot.correct { background: var(--success-bg); border-color: var(--success); border-style: solid; }
+.match-slot.incorrect { background: var(--danger-bg); border-color: var(--danger); border-style: solid; }
+.footer { text-align: center; padding: 20px; color: var(--text); opacity: 0.7; font-size: 12px; margin-top: 20px; }
+.footer a { color: var(--primary); text-decoration: none; }
+.legend { display: flex; gap: 10px; flex-wrap: wrap; font-size: 11px; margin: 8px 0; }
+.legend-item { display: flex; align-items: center; gap: 4px; }
+.legend-swatch { width: 14px; height: 14px; border-radius: 3px; border: 2px solid var(--border); }
+.sidebar-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 90; }
+.sidebar-overlay.on { display: block; }
+
+/* MOBILE-FIRST RESPONSIVE */
+@media(max-width: 900px) {
+    .hamburger { display: flex; align-items: center; justify-content: center; }
+    .header-info h1 { font-size: 15px; }
+    .header-info .prepared { font-size: 10px; }
+    .controls button { padding: 7px 10px; font-size: 12px; min-height: 36px; }
+    .layout { grid-template-columns: 1fr; padding: 0 12px; margin: 12px auto; gap: 12px; }
+    .sidebar { position: fixed; left: -320px; top: 0; height: 100vh; max-height: 100vh; width: 300px; z-index: 95; border-radius: 0; transition: left 0.3s; padding-top: 20px; }
+    .sidebar.open { left: 0; }
+    .main { padding: 16px; border-radius: 12px; }
+    h2 { font-size: 18px; }
+    h3 { font-size: 15px; }
+    .lesson { font-size: 14px; }
+    .lesson table { font-size: 12px; }
+    .dashboard-card { width: calc(100% - 10px); margin: 5px 0; }
+    .matching-grid { grid-template-columns: 1fr; }
+    .qmeta { padding: 8px; gap: 6px; }
+    .badge { font-size: 11px; padding: 4px 8px; }
+    .option { font-size: 14px; padding: 12px; }
+    .qpalette { grid-template-columns: repeat(auto-fill, minmax(40px, 1fr)); }
+    .qnum { padding: 8px 2px; font-size: 13px; min-height: 40px; }
+    .qnav-left, .qnav-right { width: 100%; justify-content: stretch; }
+    .qnav button { flex: 1; }
+    button.act { padding: 12px 12px; font-size: 13px; }
+    .card { padding: 14px; }
+    .working { font-size: 13px; }
+    .stat-num { font-size: 24px; }
+    .modal-content { padding: 16px; margin: 10px auto; }
+    header { padding: 12px 14px; gap: 8px; }
+}
+@media(max-width: 480px) {
+    .header-info h1 { font-size: 14px; }
+    .controls button { padding: 6px 9px; font-size: 11px; min-height: 34px; }
+    .controls button:nth-child(n+4) { display: none; }
+    .layout { padding: 0 8px; margin: 8px auto; }
+    .main { padding: 12px; }
+    h2 { font-size: 17px; }
+    .qmeta { flex-direction: column; align-items: flex-start; }
+    .qnum { font-size: 12px; padding: 6px 2px; min-height: 38px; }
+}
+</style>
+</head>
+<body>
+<header>
+    <div class='header-left'>
+        <button class='hamburger' onclick='toggleSidebar()' aria-label='Menu'>&#9776;</button>
+        <div class='header-info'>
+            <h1>📚 AFACR Revision and Practice</h1>
+            <div class='prepared'>By <b>Muhammad Hussain</b> · <a href='mailto:ac.hussain07@gmail.com'>ac.hussain07@gmail.com</a></div>
+        </div>
+    </div>
+    <div class='controls'>
+        <button onclick='toggleTheme()'>🌙</button>
+        <button onclick='changeFontSize(1)'>A+</button>
+        <button onclick='changeFontSize(-1)'>A-</button>
+        <button onclick='showFormulas()'>📐 Formulas</button>
+        <button onclick='showBookmarks()'>⭐ Bookmarks</button>
+    </div>
+</header>
+<div class='sidebar-overlay' id='sidebarOverlay' onclick='closeSidebar()'></div>
+<div class='layout'>
+    <aside class='sidebar' id='sidebar'></aside>
+    <main class='main' id='main'></main>
+</div>
+<div class='modal' id='modal'>
+    <div class='modal-content'>
+        <button class='close' onclick='closeModal()'>&times;</button>
+        <div id='modalBody'></div>
+    </div>
+</div>
+<div class='footer'>
+    © 2026 AFACR Revision and Practice System · Prepared by Muhammad Hussain · <a href='mailto:ac.hussain07@gmail.com'>ac.hussain07@gmail.com</a>
+</div>
+<script>
+const DATA = {"topics": [{"id": "1", "section": "A", "title": "Substance over Form", "weight": "30%", "lesson": "<h3>1. Core concept</h3><p><b>Substance over form</b> means financial statements must reflect the <b>economic reality</b> of a transaction, not just its legal form.</p>\n<h3>2. Framework</h3><ol><li>Read legal wording.</li><li>Identify risks: default, damage, obsolescence.</li><li>Identify rewards: cash flows, use, gains.</li><li>Identify control.</li><li>Apply economic reality.</li></ol>\n<h3>3. Numerical Example — Sale and Repurchase</h3><p>A sells equipment for Rs. 1,000,000, must repurchase after 1 year for Rs. 1,120,000.</p><ul><li>Legal: Sale. Substance: Financing.</li><li>Loan liability: Rs. 1,000,000. Finance cost: Rs. 120,000.</li></ul>\n<h3>4. Factoring with Recourse</h3><p>Receivables Rs. 2,000,000 factored for Rs. 1,850,000. Company reimburses bad debts.</p><ul><li>Credit risk retained → do NOT derecognize.</li><li>Recognize loan Rs. 1,850,000 + finance cost Rs. 150,000.</li></ul>\n<h3>5. Common exam areas</h3><ul><li>Sale and repurchase</li><li>Consignment inventory</li><li>Factoring with recourse</li><li>Special purpose entities</li><li>Sale and leaseback</li></ul>", "tip": "Ask: who bears risk, gets reward, holds control?"}, {"id": "2", "section": "A", "title": "Financial Instruments — IAS 32, IFRS 7 & IFRS 9", "weight": "30%", "lesson": "<h3>1. Definition</h3><p>Contract creating financial asset for one party and financial liability/equity for another.</p>\n<h3>2. IAS 32 — Liability vs Equity</h3><ul><li><b>Liability:</b> contractual obligation to deliver cash.</li><li><b>Equity:</b> residual interest.</li></ul>\n<h3>3. IFRS 9 — Classification</h3><table border=1 cellpadding=6><tr><th>Business Model</th><th>SPPI</th><th>Measurement</th></tr><tr><td>Hold to collect</td><td>Pass</td><td>Amortised Cost</td></tr><tr><td>Hold to collect + sell</td><td>Pass</td><td>FVOCI</td></tr><tr><td>Trading / SPPI fails</td><td>—</td><td>FVTPL</td></tr></table>\n<h3>4. Amortised Cost & EIR Example</h3><p>Bond Rs. 950,000, face Rs. 1,000,000, EIR 10%, coupon Rs. 60,000.</p><ul><li>Interest Y1 = 950,000 × 10% = Rs. 95,000</li><li>Closing = 950,000 + 95,000 − 60,000 = Rs. 985,000</li></ul>\n<h3>5. ECL Impairment Stages</h3><ul><li>Stage 1: No SICR → 12-month ECL.</li><li>Stage 2: SICR → Lifetime ECL.</li><li>Stage 3: Credit impaired → Lifetime ECL + interest on net.</li></ul>\n<h3>6. Hedge Accounting</h3><p>Fair value hedge, cash flow hedge, hedge of net investment.</p>\n<h3>7. IFRS 7</h3><p>Disclose credit risk, liquidity risk, market risk with sensitivity analysis.</p>", "tip": "Master: (a) classification, (b) EIR/amortised cost, (c) ECL 3 stages."}, {"id": "3", "section": "A", "title": "Employee Benefits — IAS 19", "weight": "30%", "lesson": "<h3>1. Four categories</h3><ul><li>Short-term (within 12 months)</li><li>Post-employment</li><li>Other long-term</li><li>Termination</li></ul>\n<h3>2. Defined Contribution vs Benefit</h3><table border=1 cellpadding=6><tr><th></th><th>Contribution</th><th>Benefit</th></tr><tr><td>Obligation</td><td>Fixed contribution</td><td>Promised benefit</td></tr><tr><td>Risk</td><td>Employee</td><td>Employer</td></tr></table>\n<h3>3. Defined Benefit Example</h3><p>PV obligation Rs. 5,000,000, plan assets Rs. 4,200,000, rate 8%, service cost Rs. 300,000.</p><ul><li>Net liability opening = Rs. 800,000</li><li>Interest on obligation = 400,000; on assets = 336,000</li><li>Net interest cost = Rs. 64,000</li><li>P&L expense = 300,000 + 64,000 = Rs. 364,000</li></ul>\n<h3>4. Remeasurements</h3><p>Actuarial gains/losses → OCI (never recycled).</p>", "tip": "P&L = Service cost + Net interest. OCI = Remeasurements."}, {"id": "4", "section": "A", "title": "Share-Based Payments — IFRS 2", "weight": "30%", "lesson": "<h3>1. Three types</h3><ul><li><b>Equity-settled:</b> shares/options. Grant-date FV. Not remeasured.</li><li><b>Cash-settled:</b> SARs. Remeasured each period.</li><li><b>Choice:</b> analyse liability/equity.</li></ul>\n<h3>2. Equity-Settled Example</h3><p>100 employees × 500 options × Rs. 12. Vesting 3 years. Expected leavers 15.</p><p>Y1: 12 left, expect 10 more.</p><ul><li>Expected vesting = 78</li><li>Cumulative Y1 = 78 × 500 × 12 × 1/3 = Rs. 156,000</li></ul>\n<h3>3. Cash-Settled Example</h3><p>200 SARs, vesting 3 years, FV: Y1=8, Y2=10, Y3=12.</p><ul><li>Y1 liability = 200 × 8 × 1/3 = 533</li><li>Y2 = 200 × 10 × 2/3 = 1,333; expense = 800</li><li>Y3 = 200 × 12 = 2,400; expense = 1,067</li></ul>", "tip": "Equity = grant FV. Cash-settled = current FV, remeasured."}, {"id": "5", "section": "A", "title": "Asset Valuation & Changing Prices", "weight": "30%", "lesson": "<h3>1. Impairment (IAS 36)</h3><p>Impaired if <b>Carrying &gt; Recoverable</b>.</p><p><b>Recoverable = HIGHER of FVLCD and VIU</b></p>\n<h3>2. Example</h3><p>CA Rs. 1,500,000, FVLCD Rs. 1,200,000, VIU Rs. 1,350,000.</p><ul><li>Recoverable = Rs. 1,350,000</li><li>Impairment = Rs. 150,000</li></ul>\n<h3>3. VIU</h3><p>PV of future cash flows from asset use + disposal.</p>\n<h3>4. Changing Prices</h3><ul><li>Historical cost</li><li>Current cost</li><li>Constant purchasing power</li></ul>\n<h3>5. Reversal</h3><p>Allowed for all assets except goodwill.</p>", "tip": "Recoverable = HIGHER of FVLCD and VIU."}, {"id": "6", "section": "A", "title": "Earnings Per Share — IAS 33", "weight": "30%", "lesson": "<h3>1. Basic EPS</h3><p><b>Basic EPS = (Profit − Preference Div) / Weighted Avg Ordinary Shares</b></p>\n<h3>2. Example</h3><p>PAT Rs. 5,000,000, Pref Div Rs. 500,000. Shares: 1,000,000 Jan; 400,000 issued Jul.</p><ul><li>Attributable = Rs. 4,500,000</li><li>Weighted = 1,000,000 × 12/12 + 400,000 × 6/12 = 1,200,000</li><li>Basic EPS = Rs. 3.75</li></ul>\n<h3>3. Bonus Issue</h3><p>Retrospective. 1-for-4 bonus on 1,000,000 → weighted 1,250,000 whole year.</p>\n<h3>4. Diluted EPS</h3><p>Adjust for potential dilutive shares.</p><p>Convertible Rs. 2,000,000 at 8%, tax 30%, converts to 200,000 shares.</p><ul><li>Interest saved (net) = 2,000,000 × 8% × 70% = 112,000</li><li>Diluted = 4,612,000 / 1,400,000 = Rs. 3.29</li></ul>", "tip": "Deduct pref div. Time-weight new issues (not bonus)."}, {"id": "7", "section": "A", "title": "Other Financial Reporting Standards", "weight": "30%", "lesson": "<h3>1. IFRS 6 — E&E</h3><p>Entity develops own policy for mineral exploration expenditures.</p>\n<h3>2. IFRS 14</h3><p>First-time IFRS adopters with rate-regulated activities.</p>\n<h3>3. IAS 26</h3><p>FS of retirement benefit plan (not employer).</p>\n<h3>4. IAS 29 — Hyperinflation</h3><p>Applies when 3-year cumulative inflation ≥ 100%. Restate non-monetary items.</p><p>Example: Asset Rs. 500,000 at index 100. Current 250 → restated = Rs. 1,250,000.</p>\n<h3>5. IAS 34 — Interim</h3><p>Same policies as annual. Condensed FS + notes.</p>", "tip": "Know scope, main measurement, one trick calculation per standard."}, {"id": "8", "section": "B", "title": "Introduction to Group Accounting", "weight": "30%", "lesson": "<h3>1. Group = Parent + Subsidiaries</h3><p>Under parent's control. Consolidated as single economic entity.</p>\n<h3>2. Control (IFRS 10)</h3><ol><li>Power over investee</li><li>Exposure to variable returns</li><li>Ability to use power</li></ol>\n<h3>3. Investment Types</h3><table border=1 cellpadding=6><tr><th>Holding</th><th>Type</th><th>Method</th></tr><tr><td>&gt;50%</td><td>Subsidiary</td><td>Full consolidation</td></tr><tr><td>20-50%</td><td>Associate</td><td>Equity method</td></tr><tr><td>Joint control</td><td>JV</td><td>Equity method</td></tr><tr><td>&lt;20%</td><td>Investment</td><td>IFRS 9</td></tr></table>\n<h3>4. Exemptions</h3><ul><li>Wholly-owned intermediate parent</li><li>Ultimate parent produces IFRS FS</li><li>Not publicly traded</li></ul>", "tip": "Draw structure first. Identify control/influence."}, {"id": "9", "section": "B", "title": "Consolidated Statement of Financial Position", "weight": "30%", "lesson": "<h3>1. Six Steps</h3><ol><li>Add line-by-line</li><li>Eliminate investment</li><li>Goodwill</li><li>NCI</li><li>Group retained earnings</li><li>Eliminate intra-group + URP + FV adjustments</li></ol>\n<h3>2. Goodwill Formula</h3><p><b>Goodwill = Consideration + NCI at acq + FV previous holding − FV Net Assets</b></p>\n<h3>3. Example</h3><p>P acquires 80% of S for Rs. 1,200,000. NCI FV Rs. 260,000. Net assets FV Rs. 1,300,000. Year-end net assets Rs. 1,600,000.</p><ul><li>Goodwill = 1,200,000 + 260,000 − 1,300,000 = Rs. 160,000</li><li>NCI at year-end = 260,000 + 20% × 300,000 = Rs. 320,000</li></ul>\n<h3>4. URP Example</h3><p>P sold to S Rs. 200,000 at cost+25%. S holds Rs. 60,000.</p><ul><li>Margin on selling = 25/125 = 20%</li><li>URP = 60,000 × 20% = Rs. 12,000</li></ul>\n<h3>5. FV Adjustments</h3><p>Revalue at acquisition. Extra depreciation reduces post-acq profit.</p>", "tip": "Goodwill = What paid − What got."}, {"id": "10", "section": "B", "title": "Consolidated Statement of Comprehensive Income", "weight": "30%", "lesson": "<h3>1. Key Rules</h3><ul><li>Subsidiary from acq date only</li><li>Add 100% revenue/expenses</li><li>Eliminate intra-group sales/dividends/interest</li><li>Adjust URP in inventory</li><li>Allocate profit: Parent vs NCI</li></ul>\n<h3>2. Mid-Year Acquisition</h3><p>P acquired 75% of S on 1-Apr. Revenue Rs. 1,600,000, expenses Rs. 1,200,000 (even).</p><ul><li>Post-acq (9 months): Rev Rs. 1,200,000; Exp Rs. 900,000; Profit Rs. 300,000</li><li>NCI = 25% × 300,000 = Rs. 75,000</li></ul>\n<h3>3. Intra-Group Sales</h3><p>P sold Rs. 500,000 to S. Dr Revenue 500,000 / Cr COGS 500,000.</p>\n<h3>4. URP</h3><p>S holds Rs. 100,000, margin 20%. URP Rs. 20,000. Increase COGS, reduce inventory.</p>", "tip": "Time-apportion. Eliminate all intra-group."}, {"id": "11", "section": "B", "title": "IAS 27, IFRS 10, IFRS 3 & IFRS 13", "weight": "30%", "lesson": "<h3>1. Standards Map</h3><table border=1 cellpadding=6><tr><th>Standard</th><th>Scope</th></tr><tr><td>IFRS 10</td><td>Control & Consolidation</td></tr><tr><td>IFRS 3</td><td>Business Combinations</td></tr><tr><td>IAS 27</td><td>Separate FS</td></tr><tr><td>IFRS 13</td><td>Fair Value</td></tr></table>\n<h3>2. IFRS 3 Steps</h3><ol><li>Identify acquirer</li><li>Acquisition date</li><li>Recognize assets/liabs at FV</li><li>Goodwill/bargain purchase</li><li>Measure NCI</li></ol>\n<h3>3. IFRS 13 Hierarchy</h3><ul><li>Level 1: Quoted prices, active markets</li><li>Level 2: Observable inputs</li><li>Level 3: Unobservable</li></ul>\n<h3>4. Bargain Purchase Example</h3><p>Consideration 800,000. NCI 200,000. Net assets 1,100,000.</p><ul><li>Goodwill = 800 + 200 − 1,100 = (100,000) gain → P&L</li></ul>\n<h3>5. IAS 27</h3><p>Separate FS: cost / IFRS 9 / equity method.</p>", "tip": "IFRS 10 = Control, IFRS 3 = Combinations, IFRS 13 = FV, IAS 27 = Separate FS."}, {"id": "12", "section": "B", "title": "Non-Controlling Interests (NCI)", "weight": "30%", "lesson": "<h3>1. Two NCI Methods</h3><table border=1 cellpadding=6><tr><th>Method</th><th>Formula</th><th>Effect</th></tr><tr><td>FV (Full Goodwill)</td><td>NCI shares × FV/share</td><td>Full goodwill</td></tr><tr><td>Proportionate</td><td>NCI% × FV Net Assets</td><td>Parent goodwill only</td></tr></table>\n<h3>2. Example</h3><p>P acquires 75% for Rs. 900,000. FV Net Assets Rs. 1,000,000. FV NCI Rs. 260,000.</p><ul><li>Method 1: Goodwill = 900 + 260 − 1,000 = Rs. 160,000</li><li>Method 2: NCI = 250,000; Goodwill = 900 + 250 − 1,000 = Rs. 150,000</li></ul>\n<h3>3. NCI at Reporting Date</h3><p><b>NCI(closing) = NCI(acq) + NCI share of post-acq profit − Div − URP(if S is seller)</b></p>\n<h3>4. Full Example</h3><p>Post-acq profit 400,000. Dividend 100,000. URP 40,000. NCI 25%.</p><ul><li>Share of profit = 100,000</li><li>Share of div = 25,000</li><li>Share of URP = 10,000</li><li><b>Closing NCI = 260 + 100 − 25 − 10 = Rs. 325,000</b></li></ul>", "tip": "NCI method affects only goodwill/NCI, not group RE."}, {"id": "13", "section": "B", "title": "Acquisition of Subsidiary During Period", "weight": "30%", "lesson": "<h3>1. Pre vs Post</h3><ul><li>Pre-acq: part of net assets → goodwill</li><li>Post-acq: group reserves + NCI</li></ul>\n<h3>2. Time Apportion</h3><p>Split by months if profits accrue evenly.</p>\n<h3>3. Example</h3><p>S annual profit Rs. 900,000. P acquired 80% on 1-May. YE 31-Dec.</p><ul><li>Pre-acq (4m): Rs. 300,000 → goodwill</li><li>Post-acq (8m): Rs. 600,000</li><li>NCI = 20% × 600,000 = Rs. 120,000</li></ul>\n<h3>4. Step Acquisition</h3><p>P had 15% (cost 200,000, FV 250,000 at control). Buys 45% for 750,000.</p><ul><li>Cost of combination = 250 + 750 = 1,000,000</li><li>Gain on remeasurement = 250 − 200 = Rs. 50,000 → P&L</li></ul>", "tip": "Split pre/post. Remeasure previous holding to FV on step."}, {"id": "14", "section": "B", "title": "Consolidated Statement of Changes in Equity", "weight": "30%", "lesson": "<h3>1. Purpose</h3><p>Shows movements in equity — separate parent and NCI columns.</p>\n<h3>2. Rows</h3><ul><li>Opening balance</li><li>Profit</li><li>OCI</li><li>Dividends</li><li>Share issues</li><li>Acq/disposal effects</li><li>Closing</li></ul>\n<h3>3. NCI Example</h3><p>Opening NCI Rs. 300,000. NCI PAT Rs. 80,000. Div Rs. 20,000. OCI Rs. 10,000.</p><ul><li>Closing = 300 + 80 + 10 − 20 = Rs. 370,000</li></ul>", "tip": "SOCIE reconciles opening to closing for each equity component."}, {"id": "15", "section": "B", "title": "Associates & Joint Ventures", "weight": "30%", "lesson": "<h3>1. Associate (IAS 28)</h3><p>Significant influence — 20-50%.</p>\n<h3>2. Equity Method</h3><p><b>Carrying = Cost + Share of profit − Share of div − Impairment</b></p>\n<h3>3. Example</h3><p>Cost 500,000 for 30% associate. Profit 250,000. Div 60,000. Impairment 15,000.</p><ul><li>Share profit = 75,000 (P&L)</li><li>Share div = 18,000</li><li>Closing = 500 + 75 − 18 − 15 = Rs. 542,000</li></ul>\n<h3>4. IFRS 11</h3><ul><li>Joint operation: proportionate share of A/L/R/E</li><li>Joint venture: equity method</li></ul>", "tip": "Associate = Cost + Profit share − Dividends − Impairment."}, {"id": "16", "section": "C", "title": "Changes in Group Structures", "weight": "20%", "lesson": "<h3>1. Three Scenarios</h3><ul><li>Control gained</li><li>Control retained</li><li>Control lost</li></ul>\n<h3>2. Control Retained — Buy from NCI</h3><p>P owns 70%, buys 10% for 150,000. NCI CA of 10% = 130,000.</p><ul><li>Diff = 20,000 → equity adjustment</li><li>No goodwill/P&L</li></ul>\n<h3>3. Control Lost — Full Disposal</h3><p>Sale 2,000,000. Net assets 1,500,000. Goodwill 200,000. NCI 300,000.</p><ul><li>Gain = 2,000 + 300 − 1,500 − 200 = Rs. 600,000</li></ul>\n<h3>4. Partial Disposal</h3><ul><li>Derecognize all sub assets/liabs/goodwill/NCI</li><li>Retained interest at FV</li><li>Gain to P&L</li></ul>", "tip": "Control lost → P&L. Control retained → Equity only."}, {"id": "17", "section": "C", "title": "Complex Group Structures", "weight": "20%", "lesson": "<h3>1. Vertical (Sub-sub)</h3><p>P → 80% S → 70% T.</p>\n<h3>2. Effective Ownership</h3><p>P effective in T = 80% × 70% = 56%. But T is fully consolidated.</p>\n<h3>3. NCI in Sub-Sub</h3><p>T net assets 2,000,000.</p><ul><li>Direct NCI = 30% × 2,000,000 = 600,000</li><li>Indirect NCI = 20% × 70% × 2,000,000 = 280,000</li><li>Total NCI in T = Rs. 880,000</li></ul>\n<h3>4. D-Shaped</h3><p>P owns 60% of T directly + 80% of S which owns 25% of T. Total = 60% + (80% × 25%) = 80%.</p>", "tip": "Draw group tree. Effective ownership ≠ Control."}, {"id": "18", "section": "C", "title": "Foreign Currency — IAS 21", "weight": "20%", "lesson": "<h3>1. Definitions</h3><ul><li>Functional currency</li><li>Presentation currency</li><li>Foreign operation</li></ul>\n<h3>2. Individual Entity Rates</h3><table border=1 cellpadding=6><tr><th>Item</th><th>Rate</th><th>Diff</th></tr><tr><td>Initial</td><td>Spot</td><td>—</td></tr><tr><td>Monetary YE</td><td>Closing</td><td>P&L</td></tr><tr><td>Non-monetary historical</td><td>Historical</td><td>None</td></tr><tr><td>Non-monetary FV</td><td>Valuation date</td><td>FV treatment</td></tr></table>\n<h3>3. Example</h3><p>Buy USD 20,000 inventory on 1-Oct at Rs. 280. YE rate Rs. 285.</p><ul><li>Initial payable = 5,600,000</li><li>YE = 5,700,000</li><li>Exchange loss Rs. 100,000 → P&L</li></ul>\n<h3>4. Foreign Subsidiary</h3><ul><li>Assets/Liabs → Closing rate</li><li>Equity → Historical</li><li>Income/Expense → Average</li><li>Exchange diff → OCI (translation reserve)</li></ul>", "tip": "Monetary → Closing → P&L. Foreign operation → OCI."}, {"id": "19", "section": "C", "title": "Group Statement of Cash Flows", "weight": "20%", "lesson": "<h3>1. Structure (IAS 7)</h3><ul><li>Operating (indirect/direct)</li><li>Investing</li><li>Financing</li></ul>\n<h3>2. Group Adjustments</h3><ul><li>Cash for acq NET of cash acquired → Investing</li><li>Dividends to NCI → Financing</li><li>Share of associate profit non-cash → Add back</li><li>Dividends from associate → Investing</li></ul>\n<h3>3. Acquisition Example</h3><p>Consideration 3,000,000. Cash with sub 400,000.</p><ul><li>Net outflow = Rs. 2,600,000</li></ul>\n<h3>4. Working Capital</h3><p>Receivables up 500,000, of which 200,000 acquired with sub.</p><ul><li>True operating = 300,000 outflow</li></ul>", "tip": "Adjust WC for acquisitions/disposals."}, {"id": "20", "section": "D", "title": "Financial Statements of Specialized Companies", "weight": "20%", "lesson": "<h3>1. SMEs</h3><ul><li>Simplified standards</li><li>Goodwill amortized (max 10 yrs)</li></ul>\n<h3>2. Banks</h3><ul><li>Net interest income</li><li>Loans/advances = assets</li><li>Deposits = liabilities</li><li>IFRS 9 ECL</li></ul>\n<p>Example: Interest income Rs. 3,500,000 − Interest paid Rs. 2,100,000 = Rs. 1,400,000</p>\n<h3>3. Insurance (IFRS 17)</h3><ul><li>Premium income</li><li>Unearned premium reserve</li><li>Claims incurred</li></ul>\n<h3>4. Mutual Funds</h3><ul><li>Net assets attributable to unit holders</li><li>NAV per unit</li></ul>", "tip": "Understand business model first."}, {"id": "21", "section": "D", "title": "International Public Sector Accounting Standards", "weight": "20%", "lesson": "<h3>1. Purpose</h3><p>Transparency & accountability in public sector.</p>\n<h3>2. Two Bases</h3><ul><li>Accrual: when transactions occur</li><li>Cash: when cash flows</li></ul>\n<h3>3. IPSAS 1</h3><ul><li>Statement of Financial Position</li><li>Performance</li><li>Changes in Net Assets</li><li>Cash Flow</li><li>Notes + Budget comparison</li></ul>\n<h3>4. Example</h3><p>Grant Rs. 500,000 for 2 years. Rs. 300,000 spent Y1.</p><ul><li>Accrual: Revenue Rs. 250,000 in Y1</li><li>Cash: Rs. 500,000 inflow Y1</li></ul>", "tip": "Accrual basis dominates modern IPSAS."}, {"id": "22", "section": "D", "title": "Advancement in Non-Financial Reporting", "weight": "20%", "lesson": "<h3>1. Management Commentary</h3><p>Narrative on results, strategy, risks, prospects.</p>\n<h3>2. Climate Reporting</h3><ul><li>TCFD: Governance, Strategy, Risk, Metrics/Targets</li><li>IFRS S1 & S2</li><li>Physical vs Transition risk</li></ul>\n<h3>3. Example</h3><p>Emissions 5,000 tCO2e. Revenue Rs. 800m.</p><ul><li>Carbon intensity = 6.25 tCO2e/Rs. m</li></ul>\n<h3>4. Sustainability</h3><ul><li>Economic/Environmental/Social</li><li>GRI Standards</li><li>ESG metrics</li></ul>\n<h3>5. HR Accounting</h3><ul><li>Investment in people</li><li>Historical vs replacement cost</li></ul>", "tip": "Non-financial = long-term value + ESG + stakeholder trust."}], "mcqs": {"1": [["Company A sold a machine for Rs. 500,000 with mandatory repurchase at Rs. 560,000 in 12 months. Substance:", ["Sale + gain", "Loan Rs. 500,000 + finance cost Rs. 60,000", "Operating lease", "No entry"], 1, "Loan = cash received 500,000. Finance cost = 560,000 − 500,000 = Rs. 60,000.", "Easy"], ["Goods costing Rs. 100,000 consigned with 10% commission and full return right. When to recognize revenue?", ["On dispatch", "When customer buys goods", "Month-end", "On payment"], 1, "Risks/rewards stay with principal until final sale.", "Easy"], ["Receivables Rs. 1,000,000 factored to bank for Rs. 900,000 with full recourse:", ["Derecognize + loss", "Loan Rs. 900,000 + finance cost Rs. 100,000", "Revenue Rs. 900,000", "No entry"], 1, "With recourse: no derecognition. Loan liability + finance cost.", "Medium"], ["Sale and leaseback: sold Rs. 2,000,000 (CA 1,500,000), leased 5 years, substantial benefits retained:", ["Sale + operating lease", "Financing arrangement", "Bargain purchase", "Impairment"], 1, "Retained substantial rights → financing.", "Hard"], ["Which best shows substance over form?", ["Revenue on invoice", "Repurchase agreement as loan", "Depreciation", "Accruals"], 1, "Classic textbook example.", "Easy"], ["SPE holds receivables of X. X has no legal ownership but receives all cash flows/risks:", ["Consolidate SPE", "Ignore SPE", "Available-for-sale", "Associate"], 0, "X controls in substance → consolidate.", "Medium"], ["Machine sold Rs. 800,000, repurchase Rs. 920,000 in 18 months. Monthly finance cost:", ["Rs. 6,667", "Rs. 15,000", "Rs. 76,667", "Rs. 51,111"], 0, "120,000 / 18 = Rs. 6,667.", "Medium"], ["Sale + deep-in-money call option. Substance:", ["Sale", "Lease", "Financing", "Nothing"], 2, "Certain repurchase = financing.", "Hard"]], "2": [["Bond Rs. 950,000, EIR 10%, coupon Rs. 60,000. Closing amortised cost:", ["Rs. 1,010,000", "Rs. 985,000", "Rs. 1,000,000", "Rs. 890,000"], 1, "950,000 + 95,000 − 60,000 = Rs. 985,000.", "Medium"], ["Held to collect + SPPI passes → measurement:", ["FVTPL", "FVOCI", "Amortised cost", "Cost"], 2, "Standard rule.", "Easy"], ["Stage 2 impairment triggered by:", ["Credit impaired", "Significant increase in credit risk", "No change", "Trading"], 1, "SICR = Stage 2 = Lifetime ECL.", "Medium"], ["Mandatory conversion into fixed shares (no cash obligation):", ["Liability", "Equity", "Compound", "FVTPL"], 1, "No cash obligation → equity.", "Hard"], ["Loan Rs. 2,000,000, EIR 8%, cash Rs. 100,000. Interest income:", ["Rs. 160,000", "Rs. 100,000", "Rs. 60,000", "Rs. 260,000"], 0, "2,000,000 × 8% = Rs. 160,000.", "Easy"], ["Derivative with negative FV Rs. 50,000:", ["Asset", "Liability Rs. 50,000", "Not recognized", "Off-balance"], 1, "Negative FV = liability.", "Easy"], ["Held to collect AND sell + SPPI:", ["Amortised", "FVOCI", "FVTPL", "Cost"], 1, "Rule.", "Medium"], ["5-year loan Rs. 1,000,000 at 0% interest. Market rate 10%. Initial FV:", ["Rs. 1,000,000", "Rs. 621,000", "Rs. 1,610,000", "Rs. 500,000"], 1, "1,000,000 × 0.6209 = Rs. 621,000.", "Hard"]], "3": [["Salary Rs. 5,000,000, contribution 8%. Annual expense:", ["Rs. 40,000", "Rs. 400,000", "Rs. 4,600,000", "Rs. 800,000"], 1, "5,000,000 × 8%.", "Easy"], ["PV oblig Rs. 8m, plan assets Rs. 6.5m, rate 7%, service cost Rs. 350,000. Net interest:", ["Rs. 560,000", "Rs. 455,000", "Rs. 105,000", "Rs. 1,015,000"], 2, "560,000 − 455,000 = Rs. 105,000.", "Medium"], ["Total P&L (from prev):", ["Rs. 455,000", "Rs. 350,000", "Rs. 455,000", "Rs. 700,000"], 0, "350 + 105 = Rs. 455,000.", "Medium"], ["Actuarial gains/losses:", ["P&L", "OCI (not recycled)", "OCI (recycled)", "RE directly"], 1, "Remeasurements → OCI.", "Easy"], ["PV oblig Rs. 9m − plan assets Rs. 7.2m:", ["16.2m", "Rs. 1.8m", "Rs. 9m", "Rs. 7.2m"], 1, "Net liability.", "Easy"], ["Short-term compensated absences recognized:", ["When taken", "When service rendered", "YE only", "When paid"], 1, "Accrual as service.", "Medium"], ["Asset ceiling limits recognition of:", ["Surplus above future benefits", "All plan assets", "Actuarial losses", "Service cost"], 0, "PV of future refunds/reductions.", "Hard"], ["Contribution paid 500,000, due 480,000. Rs. 20,000 is:", ["Expense", "Prepayment", "Accrual", "OCI"], 1, "Excess = asset.", "Medium"]], "4": [["100 emp × 500 opts × Rs. 10. Vest 3 years. Annual expense:", ["Rs. 500,000", "Rs. 166,667", "Rs. 1,500,000", "Rs. 50,000"], 1, "500,000 / 3.", "Medium"], ["Cash-settled creates:", ["Equity", "Liability remeasured", "Fixed equity", "Deferred asset"], 1, "SAR liability.", "Easy"], ["50 emp × 200 SARs. FV Y1=15, Y2=18. Vest 2 years. Y2 expense:", ["Rs. 75,000", "Rs. 90,000", "Rs. 105,000", "Rs. 180,000"], 2, "180,000 − 75,000 = 105,000.", "Hard"], ["Equity-settled FV measured at:", ["Each reporting date", "Grant date only", "Exercise", "Vesting"], 1, "Grant date FV.", "Easy"], ["Market condition affects:", ["FV at grant date", "Number vesting", "Both", "Neither"], 0, "Built into grant FV.", "Hard"], ["Non-market vesting condition:", ["Adjust expense", "No adjustment", "Modification", "Cancellation"], 0, "Adjust expected vesting.", "Medium"], ["150 emp × 400 opts × Rs. 8. Vest 2 yrs. Y1 leavers estimate revised from 20 to 10. Cumulative Y1:", ["208,000", "224,000", "240,000", "168,000"], 1, "140 × 400 × 8 × 1/2 = 224,000.", "Hard"], ["Modification increasing FV:", ["Ignored", "Additional expense over vesting", "Cancellation", "Reduction"], 1, "Incremental FV.", "Medium"]], "5": [["CA 2,000,000, FVLCD 1,700,000, VIU 1,850,000. Impairment:", ["300,000", "150,000", "200,000", "0"], 1, "Recoverable = 1,850,000.", "Medium"], ["Recoverable amount:", ["Lower FVLCD/VIU", "Higher FVLCD/VIU", "FV only", "VIU only"], 1, "Higher of two.", "Easy"], ["CGU: goodwill 200,000, total CA 1,500,000, recoverable 1,200,000. Impairment allocation:", ["Goodwill 300,000", "Goodwill 200,000 + others 100,000", "Others 300,000", "GW 100,000 + others 200,000"], 1, "Goodwill first (max 200,000).", "Hard"], ["VIU uses:", ["Historical CF", "Discounted future CF", "Market price", "Book value"], 1, "PV of future CF.", "Easy"], ["Non-goodwill impairment reversal allowed if:", ["Never", "Recoverable increases", "Only on disposal", "Every 5 years"], 1, "Up to original CA.", "Medium"], ["IAS 29 non-monetary items:", ["Unchanged", "Restated using price index", "CPI", "Written off"], 1, "Restated.", "Medium"], ["Revalued asset 3,000,000 (surplus 500,000). Impaired to 2,400,000:", ["All P&L", "500,000 OCI + 100,000 P&L", "All OCI", "All RE"], 1, "Reverse surplus first.", "Hard"], ["Goodwill impairment reversal:", ["If reason changes", "Never", "Always", "Within 5 years"], 1, "Prohibited.", "Easy"]], "6": [["PAT Rs. 6m, Pref Div Rs. 400,000, Wtd shares 1.4m. Basic EPS:", ["Rs. 4.00", "Rs. 4.29", "Rs. 3.86", "Rs. 4.57"], 0, "5.6m / 1.4m.", "Medium"], ["800,000 shares. Issued 400,000 on 1-Jul. Wtd:", ["1,200,000", "1,000,000", "900,000", "800,000"], 1, "800 + 400×6/12 = 1,000,000.", "Easy"], ["1-for-5 bonus on 1-Sep. Opening 1,000,000. Weighted:", ["1,066,667", "1,200,000", "1,067,000", "1,000,000"], 1, "Bonus retrospective = 1,200,000.", "Medium"], ["Conv bond Rs. 5m at 6%, tax 25%. Converts to 500,000 shares. Earnings adj:", ["Rs. 300,000", "Rs. 225,000", "Rs. 375,000", "Rs. 250,000"], 1, "5m × 6% × 75% = 225,000.", "Hard"], ["Options dilutive when:", ["Exercise > market", "Exercise < market", "Equal", "Always"], 1, "In-the-money.", "Medium"], ["Basic EPS Rs. 5. Add: earn 100k, shares 30k. Base profit 500k, shares 100k. Diluted EPS:", ["Rs. 4.62", "Rs. 5", "Rs. 4.50", "Rs. 5.50"], 0, "600k/130k = 4.62.", "Hard"], ["Anti-dilutive potential shares:", ["Included", "Excluded", "In basic", "Written off"], 1, "Exclude if EPS increases.", "Medium"], ["Rights issue at Rs. 4, TERP Rs. 5. Adjustment factor:", ["4/5", "5/4", "1", "4/1"], 1, "Cum-rights / TERP.", "Hard"]], "7": [["IAS 34 policies:", ["Different", "Same as annual", "Cash basis", "No policies"], 1, "Same policies.", "Easy"], ["IAS 29 threshold 3-year inflation:", ["≥50%", "≥100%", "≥200%", "≥10%"], 1, "100%.", "Medium"], ["IAS 29 monetary items:", ["Restated", "Not restated", "Written off", "At cost"], 1, "Already current.", "Medium"], ["IFRS 6 allows:", ["Own policy for E&E", "FV only", "Cost only", "Revaluation only"], 0, "Flexibility.", "Easy"], ["IFRS 14 applies to:", ["All entities", "First-time IFRS + rate-regulated", "SMEs", "Banks"], 1, "First-timers only.", "Medium"], ["IAS 26 covers:", ["Retirement plans (the plan)", "Employers", "Only DC", "Only DB"], 0, "The plan itself.", "Medium"], ["Item at index 100 for Rs. 800,000. Current 300. Restated:", ["Rs. 2,400,000", "Rs. 800,000", "Rs. 266,667", "Rs. 300,000"], 0, "800,000 × 3.", "Hard"], ["Interim materiality based on:", ["Full year", "Interim data", "Prior year", "Auditor"], 1, "Interim period.", "Medium"]], "8": [["IFRS 10 control needs all EXCEPT:", ["Power", "Variable returns", "Ability to affect returns", ">50% ownership"], 3, "No majority needed.", "Medium"], ["P owns 40%, 60 investors 1% each. Board seat. This is:", ["De facto control → subsidiary", "Associate", "JV", "No influence"], 0, "Dispersed + practical dominance.", "Hard"], ["Subsidiary =", ["51% owned", "Controlled by parent", "Any investment", "20-50%"], 1, "Control defines.", "Easy"], ["Consolidated FS present:", ["Only parent", "Group as single economic entity", "Only NCI", "Only cash"], 1, "Single entity view.", "Easy"], ["Consolidation exempt when:", ["Publicly traded", "Ultimate parent produces IFRS FS + not publicly traded", "10 subsidiaries", "Bank"], 1, "Standard exemption.", "Medium"], ["Investment entities measure investees at:", ["Cost", "Amortised", "FVTPL", "Equity"], 2, "No consolidation.", "Hard"], ["Non-coterminous YE (≤ 3 months):", ["Ignore", "Interim FS or adjust", "Only annual", "Quarterly"], 1, "Adjustments allowed.", "Medium"], ["Separate FS methods:", ["Cost only", "Equity only", "IFRS 9 only", "Cost/IFRS 9/equity"], 3, "IAS 27 choice.", "Medium"]], "9": [["P acquires 80% for 1,000,000. NCI FV 220,000. NA FV 1,100,000. Goodwill:", ["100,000", "120,000", "220,000", "900,000"], 1, "1,000+220−1,100 = 120,000.", "Medium"], ["75% owned. NA at acq 800,000, YE 1,100,000. Prop NCI YE:", ["200,000", "275,000", "220,000", "300,000"], 1, "200,000 + 25% × 300,000.", "Medium"], ["P sold 300,000 to S at 20% markup on cost. S holds 120,000. URP:", ["24,000", "20,000", "60,000", "40,000"], 1, "20/120 = 16.67% × 120,000.", "Medium"], ["S sold 400,000 to P at 25% markup. P holds 200,000. URP:", ["50,000", "40,000", "100,000", "25,000"], 1, "25/125 × 200,000.", "Hard"], ["Building CA 1,000,000, FV 1,400,000, life 10 yrs. Extra dep/yr:", ["40,000", "400,000", "100,000", "140,000"], 0, "400,000/10.", "Medium"], ["Intra-group loan of 500,000:", ["Show as external", "Eliminate both", "As equity", "As revenue"], 1, "Eliminate.", "Easy"], ["Consideration includes:", ["Cash+shares+contingent at FV", "Cash only", "Shares only", "Book values"], 0, "All at FV.", "Medium"], ["Contingent consideration (liability) remeasured through:", ["P&L", "OCI", "Equity", "Not remeasured"], 0, "Through P&L.", "Hard"]], "10": [["P acquired 60% on 1-Jul. S rev 2,400,000 even. Include:", ["2,400,000", "1,200,000", "1,440,000", "720,000"], 1, "6/12.", "Easy"], ["Intra-group sales 800,000. Adjustment:", ["Dr Rev 800k / Cr COGS 800k", "Dr COGS / Cr Rev", "No adj", "Dr Inv"], 0, "Eliminate.", "Easy"], ["S profit 600,000. P owns 70%. NCI share:", ["420,000", "180,000", "600,000", "0"], 1, "30%.", "Easy"], ["Div paid by S to P Rs. 100,000:", ["Income", "Eliminate", "Expense", "OCI"], 1, "Eliminate intra-group.", "Easy"], ["URP in closing inv Rs. 30,000:", ["Dr COGS 30k / Cr Inv 30k", "No adj", "Dr Rev", "Cr COGS"], 0, "Reduce profit.", "Medium"], ["P 80% of S. S profit 500,000. GW impair 40,000 (full method). NCI profit share:", ["100,000", "92,000", "108,000", "500,000"], 1, "20% × (500−40).", "Hard"], ["FV extra dep 25,000. S profit 400,000. For NCI:", ["400,000", "375,000", "425,000", "25,000"], 1, "400−25.", "Medium"], ["Intra-group interest 60,000 S to P:", ["Reduce rev", "Elim: Dr Fin inc / Cr Fin cost", "Add OCI", "No effect"], 1, "Eliminate.", "Medium"]], "11": [["Which defines fair value?", ["IFRS 3", "IFRS 10", "IFRS 13", "IAS 27"], 2, "IFRS 13.", "Easy"], ["IFRS 3 assets at:", ["Cost", "Fair value", "Historical", "Nil"], 1, "FV required.", "Easy"], ["Bargain purchase 200,000 gain:", ["OCI", "P&L immediately", "Deferred", "Net GW"], 1, "P&L immediate.", "Medium"], ["Level 1 fair value:", ["Quoted active markets", "Adjusted market", "Unobservable", "Book"], 0, "Level 1.", "Easy"], ["Land CA 900k, FV 1.3m. GW adjustment:", ["Ignore", "Add 400k to NA", "Deduct 400k", "Adjust cash"], 1, "Reduces GW.", "Medium"], ["Contingent liability (reliably measurable) at acq:", ["Zero", "Nominal", "Fair value", "Ignored"], 2, "IFRS 3.", "Hard"], ["Acquisition-related costs:", ["Capitalize to GW", "Expense", "Deferred", "OCI"], 1, "Expense.", "Medium"], ["Deferred tax on FV adjustments affects:", ["Only P&L", "Goodwill", "Only OCI", "Not recognized"], 1, "Changes NA.", "Hard"]], "12": [["FV method gives higher goodwill because:", ["NCI at FV includes GW", "Prop excludes NCI's GW", "Both", "Neither"], 2, "Full GW includes NCI share.", "Medium"], ["NCI opening 300,000. S PAT 500,000. NCI 25%. Div 80,000. Closing:", ["400,000", "405,000", "425,000", "300,000"], 1, "300+125−20=405,000.", "Medium"], ["Which is FALSE about NCI?", ["In equity", "Share of profit shown", "Deducted from group profit", "Excluded from FS"], 3, "NCI fully included.", "Easy"], ["NCI credited with:", ["100% sub profit", "NCI% × sub profit adj", "0", "Only divs"], 1, "Standard.", "Easy"], ["P 60%. FV method. GW impair 100,000. NCI share:", ["0", "40,000", "60,000", "100,000"], 1, "40% × 100,000.", "Hard"], ["S sold 100,000 to P at 25% margin on cost. All in stock. NCI 25%. NCI URP share:", ["5,000", "20,000", "0", "15,000"], 0, "25% × 20,000.", "Hard"], ["Prop NCI = 30% × 800,000:", ["240,000", "800,000", "560,000", "30,000"], 0, "Standard.", "Easy"], ["Different NCI methods per combination:", ["No", "Yes, per combination", "Yes with disclosure", "Private only"], 1, "IFRS 3 allows.", "Medium"]], "13": [["S profit 1,200,000. P 70% on 1-May. Post-acq:", ["800,000", "400,000", "1,200,000", "700,000"], 0, "8/12.", "Medium"], ["Pre-acq profits go to:", ["Group RE", "NA at acq (GW)", "NCI only", "Div"], 1, "Part of NA.", "Easy"], ["P 20% (cost 300k, FV 400k). Buys 45% for 900k. Gain on remeasure:", ["100,000", "400,000", "900,000", "0"], 0, "400−300.", "Hard"], ["Cost of step combination:", ["Only new", "FV previous + new", "Book only", "Cash + book"], 1, "IFRS 3.", "Medium"], ["S profits not evenly accrued:", ["Time-apportion", "Actual figures", "Ignore", "Full year"], 1, "Use actuals.", "Medium"], ["Pre-acq dividends from S:", ["Group income", "Reduce investment", "Post-acq income", "OCI"], 1, "Capital recovery.", "Hard"], ["Post-acq div Rs. 60,000 S to P 80%:", ["Recognize as income", "Eliminate", "OCI", "Reserve"], 1, "Eliminate.", "Easy"], ["Previous 25% associate at gaining control: CA 380,000, FV 500,000. Gain:", ["120,000", "500,000", "380,000", "0"], 0, "500−380.", "Medium"]], "14": [["SOCIE shows movements for:", ["Only parent", "Only NCI", "Both (separate columns)", "Only RE"], 2, "Standard.", "Easy"], ["NCI open 400,000. PAT share 100,000. OCI 30,000. Div 25,000. Closing:", ["505,000", "555,000", "500,000", "475,000"], 0, "400+100+30−25=505,000.", "Medium"], ["Bonus issue in SOCIE:", ["Dr RE / Cr Share cap", "Not shown", "In OCI", "Div row"], 0, "Reserve to capital.", "Medium"], ["Change in ownership no control loss:", ["P&L", "Equity transaction only", "OCI", "GW adjustment"], 1, "Standard.", "Medium"], ["Parent's div to shareholders:", ["Parent column", "NCI column", "P&L", "OCI"], 0, "Reduces parent equity.", "Easy"], ["Total comp income parent 800k, NCI 150k. SOCIE shows:", ["800,000", "950,000 split", "150,000", "650,000"], 1, "Split columns.", "Easy"], ["New share issue by parent 500,000:", ["Inc parent SC/premium", "Dec RE", "Inc NCI", "OCI"], 0, "Standard.", "Easy"], ["Transfer between reserves:", ["Zero net effect", "Reduces equity", "Increases equity", "P&L"], 0, "Reallocation.", "Hard"]], "15": [["Invest 800,000 for 30%. Assoc PAT 400,000. Div 100,000. Closing:", ["1,050,000", "890,000", "800,000", "920,000"], 1, "800+120−30=890,000.", "Medium"], ["Significant influence at:", ["10-20%", "20-50%", "50-75%", ">75%"], 1, "IAS 28.", "Easy"], ["Assoc profit share in group SOCI:", ["One line after operating", "In revenue", "OCI", "Finance"], 0, "Below operating.", "Easy"], ["Impairment of investment in associate 50,000:", ["Dr P&L / Cr Invest", "Dr OCI", "Dr GW", "No entry"], 0, "P&L.", "Medium"], ["JV accounting:", ["Line-by-line", "Equity method", "FV only", "Historical"], 1, "IFRS 11.", "Easy"], ["Joint operation:", ["Equity", "Prop share of A/L/R/E", "Cost", "FVOCI"], 1, "Proportionate.", "Medium"], ["Investor's share of assoc losses > CA:", ["Continue", "Stop at zero unless obligation", "Fund extra", "Recognize forever"], 1, "Stop at zero.", "Hard"], ["Downstream sale to assoc 100,000 profit. 60% held. Investor 25%. URP elim:", ["100,000", "25,000", "15,000", "60,000"], 2, "60,000 × 25%.", "Hard"]], "16": [["P owns 80%. Buys 15% for 300k. NCI CA 260k. Impact:", ["GW +40k", "Reduce parent equity 40k", "Gain 40k", "Nothing"], 1, "Equity adj.", "Medium"], ["P sells 30% of S, retains 55% (still controls). Sale 800k. NCI CA 30% = 700k:", ["100k P&L", "100k equity gain", "100k loss", "No impact"], 1, "Equity.", "Hard"], ["Sell entire 80% for 3m. NA 2.2m. GW 300k. NCI 550k. Gain:", ["500k", "1,050k", "800k", "200k loss"], 1, "3m+550k−2.2m−300k.", "Hard"], ["Loss of control — retained investment at:", ["Historical cost", "FV at date", "Book", "Nil"], 1, "Remeasure to FV.", "Medium"], ["Sub becomes assoc:", ["Continue consolidation", "Switch to equity", "Investment", "Ignore"], 1, "Prospective.", "Medium"], ["P disposed 40% of 90%. Retained 50%. This is:", ["Loss of control", "Retained", "Depends on facts", "Immaterial"], 2, "50% ambiguous.", "Hard"], ["Gain on loss of control includes:", ["Only cash − CA", "Cash + FV retained + NCI − NA − GW", "Book gains", "Only NCI"], 1, "Full formula.", "Medium"], ["Increase 60→80% at 500k. NCI 20% CA 400k:", ["GW −100k", "NCI down 400k + equity down 100k + cash out 500k", "P&L 100k", "No effect"], 1, "Equity.", "Medium"]], "17": [["P 80% S, S 70% T. P's effective in T:", ["70%", "80%", "56%", "150%"], 2, "80×70.", "Easy"], ["Same. T NA 3m. Total NCI in T:", ["600k", "1,320k", "900k", "2,100k"], 1, "900k + 420k.", "Hard"], ["Vertical group:", ["One sub", "P→S→SubSub", "Parallel subs", "Multiple parents"], 1, "Standard.", "Easy"], ["P 60% T direct + 80% S which owns 20% T. Total in T:", ["60%", "76%", "80%", "20%"], 1, "60+16.", "Medium"], ["Sub-sub GW calculated at:", ["P gained control", "S controlled sub-sub", "YE", "Consol date"], 1, "When S gained control.", "Medium"], ["P 80% S, S 30% T. T is:", ["Consolidated", "Associate of group", "Excluded", "Subsidiary"], 1, "Indirect associate.", "Medium"], ["Consolidation order:", ["Top-down", "Bottom-up", "Simultaneous", "N/A"], 1, "Bottom up.", "Hard"], ["Both S→P div 100k and T→S div 60k:", ["Show both", "Eliminate both", "Only P's", "Only S's"], 1, "All intra-group.", "Medium"]], "18": [["USD receivable 50,000. Rate: 280→290. Exchange gain:", ["500,000", "14,500,000", "14,000,000", "Nil"], 0, "50k × 10.", "Medium"], ["Monetary YE at:", ["Closing", "Historical", "Average", "Spot"], 0, "Standard.", "Easy"], ["Non-monetary at historical cost:", ["Closing", "Transaction date", "Average", "Future"], 1, "Historical.", "Easy"], ["Foreign sub A/L closing, income avg. Diff to:", ["P&L", "OCI", "RE", "Share premium"], 1, "Translation reserve.", "Medium"], ["USD payable 100,000. Rate 275→265:", ["1m gain", "1m loss", "26.5m", "No effect"], 0, "Payable decreases.", "Medium"], ["On disposal, cumulative CTA:", ["Reclass OCI to P&L", "Keep OCI", "Written off", "Distributed"], 0, "Reclass.", "Hard"], ["Foreign sub GW translated at:", ["Closing rate each period", "Historical", "Average", "Not translated"], 0, "Closing.", "Hard"], ["Functional currency:", ["Chosen by mgmt", "Primary economic environment", "Parent's", "USD"], 1, "Standard.", "Easy"]], "19": [["Acq consideration 5m, cash acquired 700k. Net investing outflow:", ["5,700,000", "5,000,000", "4,300,000", "700,000"], 2, "Net.", "Medium"], ["Dividends to NCI:", ["Operating", "Investing", "Financing", "OCI"], 2, "Financing.", "Easy"], ["Depreciation 500k (indirect):", ["Cash out", "Add back", "Deduct", "Ignore"], 1, "Non-cash.", "Easy"], ["Share of assoc profit 200k (indirect):", ["Add", "Deduct (non-cash)", "Cash inflow", "Ignore"], 1, "Non-cash.", "Medium"], ["Inv up 400k, 100k acquired with sub. Cash effect:", ["400k", "300k", "Inflow 300k", "100k"], 1, "400−100.", "Hard"], ["Interest paid 200k under IAS 7:", ["Only financing", "Op OR financing consistent", "Only op", "Only investing"], 1, "Choice.", "Medium"], ["FX effect on cash:", ["Operating", "Separate reconciling", "Financing", "Not shown"], 1, "Reconciling line.", "Medium"], ["Loss on PPE 40k, sale 500k:", ["Add loss back + 500k investing", "460k investing", "Deduct loss", "Operating"], 0, "Non-cash + proceeds.", "Hard"]], "20": [["Bank interest income 4.5m, expense 2.8m. Net:", ["7.3m", "1.7m", "4.5m", "2.8m"], 1, "4.5−2.8.", "Easy"], ["Bank's primary liability:", ["Trade payables", "Customer deposits", "Share capital", "Inventory"], 1, "Standard.", "Easy"], ["Premium 1m for 12-month starting 1-Oct. YE 31-Dec. UPR:", ["250k", "750k", "1m", "0"], 1, "9/12 × 1m.", "Medium"], ["NAV: assets 100m, liab 2m, 4.9m units:", ["Rs. 20.00", "Rs. 20.40", "Rs. 20.41", "Rs. 21.00"], 1, "98/4.9=20.00 approx.", "Medium"], ["IFRS for SMEs goodwill:", ["Not amortized", "Amortized max 10 yrs", "Impaired only", "Written off"], 1, "Amortized.", "Medium"], ["Bank loans impairment under:", ["IAS 36", "IFRS 9 ECL", "IFRS 3", "IAS 39"], 1, "ECL.", "Medium"], ["Claims paid 500k, outstanding +100k. Incurred:", ["400k", "500k", "600k", "100k"], 2, "Paid + change.", "Hard"], ["Capital adequacy for:", ["Banks", "SMEs", "MFs only", "Any"], 0, "Banks.", "Easy"]], "21": [["Grant 2m over 4-year project. Accrual Y1:", ["2m", "500k", "0", "1m"], 1, "2/4.", "Medium"], ["Cash basis: expense 100k Dec paid Jan:", ["Dec", "Jan", "Never", "Split"], 1, "When paid.", "Easy"], ["IPSAS 1 requires:", ["BS only", "Full set + budget compare", "Cash flow only", "BS+IS"], 1, "Five components.", "Medium"], ["3-year inflation 120%. IAS 29?", ["No", "Yes", "Depends", "Private only"], 1, "≥100%.", "Easy"], ["Public accountability enhanced by:", ["Cash only", "Accrual + budget compare", "Ignore assets", "Suppress"], 1, "Accrual.", "Easy"], ["Non-exchange transactions:", ["Sales", "Taxes/transfers", "Interest", "Rent"], 1, "No equal exchange.", "Medium"], ["IPSAS accrual capital assets:", ["Expensed", "Capitalized/depreciated", "Not recognized", "Only disclosed"], 1, "Standard.", "Medium"], ["Cash basis reporting:", ["All IPSAS", "Cash Basis IPSAS", "IFRS", "IPSAS 1"], 1, "Cash Basis IPSAS.", "Medium"]], "22": [["Emissions 8,000 tCO2e. Revenue Rs. 1,000m. Carbon intensity:", ["8 tCO2e", "0.125", "800", "1,000"], 0, "8,000/1,000.", "Easy"], ["TCFD pillars:", ["Governance/Strategy/Risk/Metrics", "Only Gov", "Only Metrics", "Only Strategy"], 0, "Four pillars.", "Medium"], ["Management commentary:", ["Only historical", "Narrative on results/strategy/risks/prospects", "Only forecast", "Just KPIs"], 1, "Standard.", "Easy"], ["Physical risk:", ["Regulatory", "Extreme weather / long-term", "Investor", "Reputation"], 1, "Physical.", "Medium"], ["Transition risk:", ["Flooding", "Policy/regulatory to low-carbon", "Sea level", "Heatwaves"], 1, "Transition.", "Medium"], ["HR accounting capitalizes:", ["Salaries", "Recruitment/training", "Rent", "Depreciation"], 1, "Investment.", "Medium"], ["IFRS S1 addresses:", ["General sustainability", "Only climate", "Only social", "Only gov"], 0, "S1 general.", "Hard"], ["Non-financial reporting matters because:", ["Replaces FS", "Provides long-term value view", "Cheaper", "Optional"], 1, "Standard.", "Easy"]]}, "sections": [{"id": "A", "title": "Part A — Recognition and Measurement", "weight": "30%", "topic_ids": ["1", "2", "3", "4", "5", "6", "7"]}, {"id": "B", "title": "Part B — Group Financial Statements", "weight": "30%", "topic_ids": ["8", "9", "10", "11", "12", "13", "14", "15"]}, {"id": "C", "title": "Part C — Complex Group Topics", "weight": "20%", "topic_ids": ["16", "17", "18", "19"]}, {"id": "D", "title": "Part D — Specialized & Non-Financial", "weight": "20%", "topic_ids": ["20", "21", "22"]}], "case_studies": [{"id": "cs1", "title": "Case Study 1: Consolidated SOFP with Goodwill, NCI and URP", "scenario": "<p>On 1-January-2025, Prime Ltd acquired 75% of Sub Ltd for Rs. 2,400,000 cash. The fair value of NCI at acquisition was Rs. 720,000.</p>\n<p>At acquisition, Sub's identifiable net assets:</p><ul><li>Share capital Rs. 1,000,000</li><li>Retained earnings Rs. 1,600,000</li><li>Building fair value uplift Rs. 400,000 (remaining useful life 10 years)</li></ul>\n<p>During the year:</p><ul><li>Prime sold inventory to Sub for Rs. 500,000 at markup 25% on cost. Sub still holds Rs. 200,000 at year end.</li><li>Sub's retained earnings at 31-Dec-2025 = Rs. 2,100,000</li></ul>", "questions": [["Fair value of Sub's identifiable net assets at acquisition:", ["Rs. 2,600,000", "Rs. 3,000,000", "Rs. 2,400,000", "Rs. 3,120,000"], 1, "1,000+1,600+400 = 3,000,000.", "Medium"], ["Goodwill on acquisition:", ["Rs. 120,000", "Rs. 720,000", "Rs. 0", "Rs. 400,000"], 0, "2,400+720−3,000 = Rs. 120,000.", "Medium"], ["Extra depreciation on FV uplift:", ["Rs. 40,000", "Rs. 400,000", "Rs. 100,000", "Rs. 0"], 0, "400,000/10.", "Easy"], ["URP in closing inventory:", ["Rs. 50,000", "Rs. 40,000", "Rs. 100,000", "Rs. 25,000"], 1, "25/125 × 200,000 = 40,000.", "Medium"], ["Sub's post-acq retained earnings (adjusted):", ["Rs. 500,000", "Rs. 460,000", "Rs. 420,000", "Rs. 300,000"], 1, "500,000 − 40,000.", "Medium"], ["Closing NCI:", ["Rs. 720,000", "Rs. 835,000", "Rs. 900,000", "Rs. 780,000"], 1, "720+25%×460=835,000.", "Hard"]]}, {"id": "cs2", "title": "Case Study 2: EPS with New Issue, Bonus & Convertible Bond", "scenario": "<p>ABC Ltd's profit after tax for year ended 31-Dec-2025 was Rs. 8,000,000. Preference dividend paid Rs. 500,000.</p>\n<p>Share history:</p><ul><li>1-Jan-2025: 2,000,000 ordinary shares outstanding</li><li>1-Apr-2025: Issued 600,000 shares at full market value</li><li>1-Oct-2025: 1-for-10 bonus issue</li></ul>\n<p>Outstanding: Rs. 5,000,000 convertible bonds at 8% (tax 25%), each Rs. 100 bond converts to 20 shares.</p>", "questions": [["Profit attributable to ordinary shareholders:", ["Rs. 8,000,000", "Rs. 7,500,000", "Rs. 8,500,000", "Rs. 500,000"], 1, "8m − 500k.", "Easy"], ["Weighted shares before bonus adjustment:", ["2,600,000", "2,450,000", "2,000,000", "2,300,000"], 1, "2m×3/12 + 2.6m×9/12.", "Hard"], ["Total weighted shares with 1-for-10 bonus:", ["2,690,000", "2,860,000", "2,695,000", "2,600,000"], 2, "2,450,000 × 1.10.", "Hard"], ["Basic EPS:", ["Rs. 2.78", "Rs. 3.06", "Rs. 2.98", "Rs. 3.75"], 0, "7.5m / 2.695m.", "Medium"], ["Shares from bond conversion:", ["1,000,000", "500,000", "100,000", "5,000,000"], 0, "50,000 bonds × 20.", "Medium"], ["Diluted EPS:", ["Rs. 2.28", "Rs. 2.11", "Rs. 2.20", "Rs. 2.35"], 1, "(7.5m+300k)/(2.695m+1m).", "Hard"]]}, {"id": "cs3", "title": "Case Study 3: Foreign Subsidiary Translation", "scenario": "<p>Global Ltd (functional currency Rs.) acquired 100% of USA Inc on 1-Jan-2025 for USD 500,000.</p>\n<ul><li>USA Inc's net assets at acquisition = USD 500,000</li><li>Rate at acq: Rs. 275/USD</li></ul>\n<p>During 2025:</p><ul><li>Profit for the year: USD 100,000 (average rate Rs. 280)</li><li>Closing rate 31-Dec-2025: Rs. 290/USD</li><li>USA Inc's net assets at 31-Dec-2025 = USD 600,000</li></ul>", "questions": [["Net assets at acquisition in Rs.:", ["Rs. 137,500,000", "Rs. 140,000,000", "Rs. 145,000,000", "Rs. 500,000"], 0, "500k × 275.", "Easy"], ["Net assets at YE in Rs.:", ["Rs. 165,000,000", "Rs. 174,000,000", "Rs. 137,500,000", "Rs. 168,000,000"], 1, "600k × 290.", "Easy"], ["Profit translated:", ["Rs. 28,000,000", "Rs. 29,000,000", "Rs. 27,500,000", "Rs. 30,000,000"], 0, "100k × 280.", "Medium"], ["Expected closing NA (opening + profit):", ["Rs. 165,500,000", "Rs. 172,000,000", "Rs. 174,000,000", "Rs. 168,000,000"], 0, "137.5m + 28m.", "Medium"], ["Translation gain (OCI):", ["Rs. 8,500,000", "Rs. 2,000,000", "Rs. 5,000,000", "Rs. 174,000,000"], 0, "174m − 165.5m.", "Hard"]]}], "formulas": [["Goodwill", "Consideration + NCI at acquisition + FV previous holding − FV Net Assets"], ["NCI (Closing)", "NCI(acq) + NCI share of post-acq profit − NCI share of dividends − NCI share of URP (if S is seller)"], ["Effective Ownership", "Parent's % × Sub's % (for sub-subsidiary)"], ["Recoverable Amount", "HIGHER of FVLCD and Value in Use"], ["Basic EPS", "(PAT − Preference Dividend) / Weighted Avg Ordinary Shares"], ["Diluted EPS", "Adjusted Earnings / (Weighted Avg + Potential Shares)"], ["Amortised Cost", "Opening + (Opening × EIR) − Cash Received"], ["URP", "Selling Price of Unsold Stock × Profit Margin %"], ["Margin on Cost 25%", "= 25/125 = 20% on selling price"], ["Foreign Sub Translation", "A/L = Closing rate; Income = Avg; Equity = Historical; Diff → OCI"], ["Defined Benefit P&L", "Service Cost + Net Interest on net obligation"], ["Equity-Settled SBP", "Grant FV × Expected Vesting × (Time / Total Vesting)"], ["Cash-Settled SBP", "Current FV × (Time / Total Vesting), remeasured each period"], ["Post-Acquisition Profit", "Time-apportion if profits evenly accrued"], ["Bargain Purchase", "When FV Net Assets > Consideration + NCI → Gain to P&L"]], "matching": [{"title": "Match Standard to Topic", "pairs": [["IFRS 10", "Consolidated Financial Statements & Control"], ["IFRS 3", "Business Combinations"], ["IFRS 13", "Fair Value Measurement"], ["IAS 27", "Separate Financial Statements"], ["IAS 28", "Associates and Joint Ventures"], ["IFRS 11", "Joint Arrangements"], ["IAS 21", "Foreign Exchange Rates"], ["IAS 33", "Earnings Per Share"]]}, {"title": "Match Transaction to Treatment", "pairs": [["Sale and repurchase", "Loan liability + finance cost"], ["Consignment inventory", "No revenue until final sale"], ["Intra-group URP", "Reduce group profit and inventory"], ["Dividend from associate", "Reduce carrying amount"], ["Control retained change", "Equity transaction — no P&L"], ["Loss of control", "P&L gain/loss + FV retained interest"]]}, {"title": "Match Item to Rate (Foreign Currency)", "pairs": [["Monetary items YE", "Closing rate"], ["Non-monetary historical cost", "Historical rate"], ["Foreign sub A/L", "Closing rate"], ["Foreign sub income", "Average rate"], ["Foreign sub equity at acq", "Historical rate"], ["Translation exchange difference", "OCI (translation reserve)"]]}]};
+let state = { completed: {}, bookmarks: [], scores: {} };
+try { const saved = localStorage.getItem('afacrV5'); if (saved) state = Object.assign(state, JSON.parse(saved)); } catch(e){}
+function saveState(){ try { localStorage.setItem('afacrV5', JSON.stringify(state)); } catch(e){} }
+
+let quiz = { type:null, id:null, title:'', questions:[], idx:0, answers:[], scenario:null };
+let selectedDiff = 'All';
+
+let theme = 'light';
+try { theme = localStorage.getItem('theme') || 'light'; } catch(e){}
+document.documentElement.setAttribute('data-theme', theme);
+function toggleTheme(){ theme = theme==='dark'?'light':'dark'; document.documentElement.setAttribute('data-theme', theme); try { localStorage.setItem('theme', theme); } catch(e){} }
+let fs = 15; try { fs = parseInt(localStorage.getItem('fs')||'15'); } catch(e){}
+document.body.style.setProperty('--font-size', fs+'px');
+function changeFontSize(d){ fs = Math.max(12, Math.min(20, fs+d)); document.body.style.setProperty('--font-size', fs+'px'); try { localStorage.setItem('fs', fs); } catch(e){} }
+
+// Mobile sidebar toggle
+function toggleSidebar(){ document.getElementById('sidebar').classList.toggle('open'); document.getElementById('sidebarOverlay').classList.toggle('on'); }
+function closeSidebar(){ document.getElementById('sidebar').classList.remove('open'); document.getElementById('sidebarOverlay').classList.remove('on'); }
+
+function findTopic(tid){ return DATA.topics.find(t => t.id === tid); }
+function shuffle(a){ const arr=[...a]; for(let i=arr.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [arr[i],arr[j]]=[arr[j],arr[i]]; } return arr; }
+function filterByDiff(qs, diff){ if(!diff||diff==='All') return qs; return qs.filter(q => q[4]===diff); }
+
+function renderNav(){
+    let h = '';
+    let total=0, done=0;
+    DATA.topics.forEach(t => { total++; if(state.completed[t.id]) done++; });
+    const pct = total>0 ? Math.round(done/total*100) : 0;
+    h += `<div style='padding:12px;background:var(--accent);border-radius:10px;margin-bottom:10px'><b>📊 Progress:</b> ${done}/${total} (${pct}%)<div class='progress'><div class='bar' style='width:${pct}%'></div></div></div>`;
+    h += `<button class='navbtn special' onclick='navClick(()=>showDashboard())'>📊 Dashboard</button>`;
+    h += `<button class='navbtn special' onclick='navClick(()=>showMatching())'>🔀 Matching Exercises</button>`;
+    h += `<button class='navbtn special' onclick='navClick(()=>showCaseStudies())'>📚 Case Studies</button>`;
+    DATA.sections.forEach(s => {
+        h += `<div class='section-title'>${s.title} (${s.weight})</div>`;
+        s.topic_ids.forEach(tid => {
+            const t = findTopic(tid);
+            const cls = state.completed[tid] ? 'done' : '';
+            h += `<button class='navbtn ${cls}' onclick='navClick(()=>showTopic("${tid}"))'>${state.completed[tid]?'✓ ':''}${tid}. ${t.title}</button>`;
+        });
+        h += `<button class='navbtn section-test' onclick='navClick(()=>startSectionTest("${s.id}"))'>▶ Section ${s.id} Test</button>`;
+    });
+    h += `<div class='section-title'>Final</div>`;
+    h += `<button class='navbtn special' onclick='navClick(()=>startFinalExam())'>🏆 Full Mock Exam</button>`;
+    h += `<button class='navbtn' onclick='navClick(()=>showHome())'>🏠 Home</button>`;
+    h += `<button class='navbtn' onclick='resetProgress()'>🔄 Reset All Progress</button>`;
+    document.getElementById('sidebar').innerHTML = h;
+}
+function navClick(fn){ closeSidebar(); fn(); window.scrollTo(0,0); }
+
+function showHome(){
+    const total = DATA.topics.length;
+    const done = Object.keys(state.completed).length;
+    const totalMcqs = Object.values(DATA.mcqs).reduce((s,a)=>s+a.length,0);
+    document.getElementById('main').innerHTML = `
+        <div class='card gradient'>
+            <h2>Welcome to Your AFACR Revision System</h2>
+            <p>Complete self-study platform for ICMA Pakistan AFACR paper.</p>
+        </div>
+        <div class='card'>
+            <h3>🎯 How to Use</h3>
+            <ol>
+                <li>On <b>mobile</b>: Tap the ☰ menu button to open topics.</li>
+                <li>Click any topic to <b>read the lesson</b> with numerical examples.</li>
+                <li>Attempt <b>topic MCQs</b> — optionally choose difficulty.</li>
+                <li>Use the <b>question palette</b> to jump between questions.</li>
+                <li>Navigate with <b>Previous / Next buttons</b>.</li>
+                <li>Attempt <b>Section Tests</b> and the <b>Full Mock Exam</b> when ready.</li>
+                <li>Practice with <b>Matching Exercises</b> (tap to match) and <b>Case Studies</b>.</li>
+            </ol>
+        </div>
+        <div class='card'>
+            <h3>📈 Your Statistics</h3>
+            <div class='dashboard-card'><div class='stat-num'>${done}/${total}</div><div class='stat-label'>Topics Completed</div></div>
+            <div class='dashboard-card'><div class='stat-num'>${totalMcqs}</div><div class='stat-label'>Total MCQs</div></div>
+            <div class='dashboard-card'><div class='stat-num'>${state.bookmarks.length}</div><div class='stat-label'>Bookmarks</div></div>
+            <div class='dashboard-card'><div class='stat-num'>${Object.keys(state.scores).length}</div><div class='stat-label'>Tests Taken</div></div>
+        </div>
+        <div class='card' style='background:var(--tip-bg);border-left:4px solid var(--tip-border)'>
+            <h3>💡 Study Tip</h3>
+            <p style='margin:0'>AFACR is <b>calculation-heavy</b>. Every question has full working. No timer — focus on <b>understanding</b>.</p>
+        </div>`;
+}
+
+function setDiff(btn, d){ document.querySelectorAll('.diff-selector button').forEach(b=>b.classList.remove('active')); btn.classList.add('active'); selectedDiff = d; }
+function markComplete(tid){ state.completed[tid]=true; saveState(); renderNav(); showTopic(tid); }
+
+function showTopic(tid){
+    const t = findTopic(tid);
+    const section = DATA.sections.find(s => s.topic_ids.includes(tid));
+    const availQs = (DATA.mcqs[tid]||[]).length;
+    document.getElementById('main').innerHTML = `
+        <span class='badge'>${section.title}</span><span class='badge purple'>Weight: ${section.weight}</span>
+        <h2>${t.id}. ${t.title}</h2>
+        <div class='card lesson'>${t.lesson}<div class='tip'><b>💡 Exam Tip:</b> ${t.tip}</div></div>
+        <div class='card'>
+            <h3>🎯 Practice This Topic</h3>
+            <p><b>Available Questions:</b> ${availQs}. Choose difficulty:</p>
+            <div class='diff-selector'>
+                <button onclick='setDiff(this,"All")' class='active'>All</button>
+                <button onclick='setDiff(this,"Easy")'>🟢 Easy</button>
+                <button onclick='setDiff(this,"Medium")'>🟡 Medium</button>
+                <button onclick='setDiff(this,"Hard")'>🔴 Hard</button>
+            </div>
+            <div class='actions'>
+                <button class='act primary' onclick='startTopicQuiz("${tid}")'>▶ Start MCQs</button>
+                <button class='act success' onclick='markComplete("${tid}")'>✓ Mark Complete</button>
+            </div>
+        </div>`;
+}
+
+function startTopicQuiz(tid){
+    const all = DATA.mcqs[tid] || [];
+    let qs = filterByDiff(all, selectedDiff);
+    if(qs.length === 0) qs = all;
+    quiz = { type:'topic', id:tid, title:findTopic(tid).title, questions:qs, idx:0, answers:new Array(qs.length).fill(null) };
+    showQuestion();
+}
+function startSectionTest(sid){
+    const section = DATA.sections.find(s => s.id === sid);
+    let all = [];
+    section.topic_ids.forEach(tid => { 
+        const topicQs = (DATA.mcqs[tid]||[]).map(q => [...q, tid]);
+        all = all.concat(shuffle(topicQs).slice(0, Math.max(2, Math.ceil(15/section.topic_ids.length))));
+    });
+    all = shuffle(all);
+    quiz = { type:'section', id:sid, title:'Section '+sid+' Test', questions:all, idx:0, answers:new Array(all.length).fill(null) };
+    showQuestion();
+}
+function startFinalExam(){
+    let all = [];
+    Object.keys(DATA.mcqs).forEach(tid => {
+        const qs = shuffle((DATA.mcqs[tid]||[]).map(q => [...q, tid])).slice(0, 2);
+        all = all.concat(qs);
+    });
+    all = shuffle(all);
+    quiz = { type:'final', id:'final', title:'🏆 Full Mock AFACR Exam', questions:all, idx:0, answers:new Array(all.length).fill(null) };
+    showQuestion();
+}
+
+function showQuestion(){
+    const q = quiz.questions[quiz.idx];
+    const isBookmarked = state.bookmarks.some(b => b.q === q[0]);
+    const answered = quiz.answers[quiz.idx];
+    const score = quiz.answers.filter(a => a && a.correct).length;
+    const attempted = quiz.answers.filter(a => a).length;
+
+    let palette = '';
+    quiz.questions.forEach((qq, i) => {
+        const a = quiz.answers[i];
+        let cls = 'qnum';
+        if(i === quiz.idx) cls += ' current';
+        if(a){ cls += ' answered'; cls += a.correct ? ' correct' : ' incorrect'; }
+        palette += `<div class='${cls}' onclick='goToQ(${i})'>${i+1}</div>`;
+    });
+
+    let optsHtml = '';
+    q[1].forEach((o, i) => {
+        let cls = 'option';
+        let disabled = '';
+        if(answered){
+            disabled = 'disabled';
+            if(i === q[2]) cls += ' correct';
+            if(i === answered.selected && answered.selected !== q[2]) cls += ' incorrect';
+        }
+        optsHtml += `<button class='${cls}' ${disabled} onclick='selectOption(${i})'>${String.fromCharCode(65+i)}. ${o}</button>`;
+    });
+
+    let fbHtml = '';
+    if(answered){
+        fbHtml = answered.correct
+            ? `<div class='feedback good'><b>✓ Correct!</b><div class='working'><b>Working:</b><br>${q[3]}</div></div>`
+            : `<div class='feedback bad'><b>✗ Incorrect.</b> Correct: <b>${String.fromCharCode(65+q[2])}. ${q[1][q[2]]}</b><div class='working'><b>Working:</b><br>${q[3]}</div></div>`;
+    }
+
+    document.getElementById('main').innerHTML = `
+        <h2>${quiz.title}</h2>
+        <div class='qmeta'>
+            <span class='badge'>Q ${quiz.idx+1}/${quiz.questions.length}</span>
+            <span class='badge success'>Score: ${score}/${attempted}</span>
+            <span class='badge'>${q[4]||'Medium'}</span>
+            <button class='bookmark-btn ${isBookmarked?"on":""}' onclick='toggleBookmark()'>⭐ ${isBookmarked?"Saved":"Save"}</button>
+        </div>
+        <div class='card'>
+            <h3>Question Palette</h3>
+            <div class='legend'>
+                <div class='legend-item'><div class='legend-swatch' style='background:var(--card)'></div>Not Answered</div>
+                <div class='legend-item'><div class='legend-swatch' style='background:var(--success-bg);border-color:var(--success)'></div>Correct</div>
+                <div class='legend-item'><div class='legend-swatch' style='background:var(--danger-bg);border-color:var(--danger)'></div>Incorrect</div>
+                <div class='legend-item'><div class='legend-swatch' style='background:var(--primary)'></div>Current</div>
+            </div>
+            <div class='qpalette'>${palette}</div>
+        </div>
+        <div class='card'>
+            <div class='lesson'><b>${q[0]}</b></div>
+            <div id='opts'>${optsHtml}</div>
+            ${fbHtml}
+            <div class='qnav'>
+                <div class='qnav-left'>
+                    <button class='act secondary' onclick='previousQ()' ${quiz.idx===0?'disabled':''}>← Prev</button>
+                </div>
+                <div class='qnav-right'>
+                    <button class='act warning' onclick='abortQuiz()'>Exit</button>
+                    <button class='act primary' onclick='nextQ()' ${quiz.idx===quiz.questions.length-1?'disabled':''}>Next →</button>
+                    <button class='act success' onclick='finishQuiz()'>🏁 Finish</button>
+                </div>
+            </div>
+        </div>`;
+    window.scrollTo(0,0);
+}
+
+function selectOption(i){
+    if(quiz.answers[quiz.idx]) return;
+    const q = quiz.questions[quiz.idx];
+    quiz.answers[quiz.idx] = { selected: i, correct: (i === q[2]) };
+    saveState();
+    showQuestion();
+}
+function goToQ(i){ quiz.idx = i; showQuestion(); }
+function previousQ(){ if(quiz.idx > 0){ quiz.idx--; showQuestion(); } }
+function nextQ(){ if(quiz.idx < quiz.questions.length - 1){ quiz.idx++; showQuestion(); } }
+function abortQuiz(){ if(confirm('Exit quiz without saving?')){ showHome(); } }
+function finishQuiz(){ 
+    const unanswered = quiz.answers.filter(a => !a).length;
+    if(unanswered > 0){ if(!confirm(`${unanswered} unanswered. Finish anyway?`)) return; }
+    showResult();
+}
+function toggleBookmark(){
+    const q = quiz.questions[quiz.idx];
+    const idx = state.bookmarks.findIndex(b => b.q === q[0]);
+    if(idx >= 0) state.bookmarks.splice(idx, 1);
+    else state.bookmarks.push({ q: q[0], options: q[1], answer: q[2], working: q[3], topic: q[5]||quiz.id });
+    saveState();
+    showQuestion();
+}
+
+function showResult(){
+    const score = quiz.answers.filter(a => a && a.correct).length;
+    const total = quiz.questions.length;
+    const attempted = quiz.answers.filter(a => a).length;
+    const pct = Math.round(score / total * 100);
+    let msg = pct >= 80 ? '🎉 Excellent!' : pct >= 60 ? '👍 Good — revise weak areas.' : '📚 Needs work — revise the topics.';
+
+    if(quiz.type === 'topic' && pct >= 60){ state.completed[quiz.id] = true; }
+    state.scores[quiz.type+'_'+quiz.id+'_'+Date.now()] = { title: quiz.title, score, total, pct, date: Date.now() };
+    saveState();
+
+    let weakHtml = '';
+    if(quiz.type === 'section' || quiz.type === 'final'){
+        const topicScores = {};
+        quiz.questions.forEach((q, i) => {
+            const tid = q[5] || quiz.id;
+            if(!topicScores[tid]) topicScores[tid] = { correct:0, total:0 };
+            topicScores[tid].total++;
+            if(quiz.answers[i] && quiz.answers[i].correct) topicScores[tid].correct++;
+        });
+        weakHtml = `<div class='card'><h3>📊 Weak Area Analysis</h3>`;
+        Object.keys(topicScores).sort().forEach(tid => {
+            const t = findTopic(tid);
+            const tName = t ? `${tid}. ${t.title}` : tid;
+            const ts = topicScores[tid];
+            const tp = Math.round(ts.correct / ts.total * 100);
+            const status = tp >= 80 ? '🟢' : tp >= 50 ? '🟡' : '🔴';
+            weakHtml += `<div style='padding:10px;margin:6px 0;background:var(--accent);border-radius:8px'>${status} <b>${tName}</b> — ${ts.correct}/${ts.total} (${tp}%)</div>`;
+        });
+        weakHtml += `</div>`;
+    }
+
+    document.getElementById('main').innerHTML = `
+        <h2>📋 Result — ${quiz.title}</h2>
+        <div class='card gradient'>
+            <div class='dashboard-card' style='background:rgba(255,255,255,0.2)'><div class='stat-num' style='color:white'>${score}/${total}</div><div class='stat-label' style='color:white'>Correct</div></div>
+            <div class='dashboard-card' style='background:rgba(255,255,255,0.2)'><div class='stat-num' style='color:white'>${pct}%</div><div class='stat-label' style='color:white'>Percentage</div></div>
+            <div class='dashboard-card' style='background:rgba(255,255,255,0.2)'><div class='stat-num' style='color:white'>${attempted}/${total}</div><div class='stat-label' style='color:white'>Attempted</div></div>
+            <div class='dashboard-card' style='background:rgba(255,255,255,0.2)'><div class='stat-num' style='color:white'>${total-attempted}</div><div class='stat-label' style='color:white'>Skipped</div></div>
+            <p style='margin-top:16px'>${msg}</p>
+        </div>
+        ${weakHtml}
+        <div class='actions'>
+            <button class='act primary' onclick='showHome()'>🏠 Home</button>
+            <button class='act secondary' onclick='showDashboard()'>📊 Dashboard</button>
+            <button class='act success' onclick='reviewQuiz()'>👁 Review</button>
+        </div>`;
+    renderNav();
+}
+function reviewQuiz(){ quiz.idx = 0; showQuestion(); }
+
+function showDashboard(){
+    const total = DATA.topics.length;
+    const done = Object.keys(state.completed).length;
+    const totalMcqs = Object.values(DATA.mcqs).reduce((s,a)=>s+a.length,0);
+    let scoresHtml = '';
+    const scoresList = Object.entries(state.scores).sort((a,b) => b[1].date - a[1].date).slice(0,10);
+    scoresList.forEach(([k, sc]) => {
+        const color = sc.pct >= 80 ? 'var(--success)' : sc.pct >= 60 ? 'var(--tip-border)' : 'var(--danger)';
+        const date = new Date(sc.date).toLocaleString();
+        scoresHtml += `<div style='padding:12px;margin:6px 0;background:var(--accent);border-radius:8px;border-left:4px solid ${color}'><b>${sc.title}</b><br>${sc.score}/${sc.total} (${sc.pct}%)<br><small style='opacity:0.7'>${date}</small></div>`;
+    });
+    if(!scoresHtml) scoresHtml = '<p style="opacity:0.7"><i>No tests yet.</i></p>';
+    let topicHtml = '';
+    DATA.sections.forEach(s => {
+        const doneInSec = s.topic_ids.filter(id => state.completed[id]).length;
+        const pct = Math.round(doneInSec / s.topic_ids.length * 100);
+        topicHtml += `<div style='margin:10px 0'><b>${s.title}</b><br><small>${doneInSec}/${s.topic_ids.length}</small><div class='progress'><div class='bar' style='width:${pct}%'></div></div></div>`;
+    });
+    document.getElementById('main').innerHTML = `
+        <h2>📊 Dashboard</h2>
+        <div class='card'>
+            <div class='dashboard-card'><div class='stat-num'>${done}/${total}</div><div class='stat-label'>Topics Done</div></div>
+            <div class='dashboard-card'><div class='stat-num'>${state.bookmarks.length}</div><div class='stat-label'>Bookmarks</div></div>
+            <div class='dashboard-card'><div class='stat-num'>${totalMcqs}</div><div class='stat-label'>Total MCQs</div></div>
+            <div class='dashboard-card'><div class='stat-num'>${Object.keys(state.scores).length}</div><div class='stat-label'>Tests Taken</div></div>
+        </div>
+        <div class='card'>
+            <h3>Section Completion</h3>
+            ${topicHtml}
+        </div>
+        <div class='card'>
+            <h3>Recent Scores</h3>
+            ${scoresHtml}
+        </div>`;
+}
+
+function showFormulas(){
+    let h = `<h2>📐 AFACR Formula Cheat Sheet</h2><div class='card'>`;
+    DATA.formulas.forEach(f => { h += `<div style='padding:12px;border-bottom:1px solid var(--border)'><b style='color:var(--primary)'>${f[0]}</b><br><span style='font-family:monospace;background:var(--accent);padding:6px 10px;border-radius:6px;display:inline-block;margin-top:6px;word-break:break-word'>${f[1]}</span></div>`; });
+    h += `</div>`;
+    document.getElementById('modalBody').innerHTML = h;
+    document.getElementById('modal').classList.add('on');
+}
+function showBookmarks(){
+    let h = `<h2>⭐ Bookmarked Questions</h2>`;
+    if(state.bookmarks.length === 0){
+        h += `<div class='card'><p><i>No bookmarks yet. Click ⭐ Save on any question during a quiz.</i></p></div>`;
+    } else {
+        state.bookmarks.forEach((b, i) => {
+            const t = findTopic(b.topic);
+            h += `<div class='card'><b>Q${i+1}: ${b.q}</b><br><small>Topic: ${t?t.title:b.topic}</small><br>`;
+            b.options.forEach((o, j) => { const mark = j===b.answer?' ✓':''; const style = j===b.answer?'background:var(--success-bg);border-left:3px solid var(--success)':''; h += `<div style='padding:8px;margin:4px 0;border-radius:6px;${style}'>${String.fromCharCode(65+j)}. ${o}${mark}</div>`; });
+            h += `<div class='working'><b>Working:</b><br>${b.working}</div>`;
+            h += `<button class='act danger' style='margin-top:10px' onclick='removeBookmark(${i});showBookmarks()'>Remove</button></div>`;
+        });
+    }
+    document.getElementById('modalBody').innerHTML = h;
+    document.getElementById('modal').classList.add('on');
+}
+function removeBookmark(i){ state.bookmarks.splice(i,1); saveState(); }
+
+function showCaseStudies(){
+    let h = `<h2>📚 Case Studies</h2><div class='card'><p>Multi-part exam-style scenarios.</p></div>`;
+    DATA.case_studies.forEach(cs => {
+        h += `<div class='card'><h3>${cs.title}</h3><p>${cs.questions.length} sub-questions</p><button class='act primary' onclick='startCaseStudy("${cs.id}")'>▶ Start</button></div>`;
+    });
+    document.getElementById('main').innerHTML = h;
+}
+function startCaseStudy(csid){
+    const cs = DATA.case_studies.find(c => c.id === csid);
+    quiz = { type:'case', id:csid, title:cs.title, questions:cs.questions, idx:0, answers:new Array(cs.questions.length).fill(null), scenario:cs.scenario };
+    showCaseQuestion();
+}
+function showCaseQuestion(){
+    const q = quiz.questions[quiz.idx];
+    const answered = quiz.answers[quiz.idx];
+    const score = quiz.answers.filter(a => a && a.correct).length;
+    const attempted = quiz.answers.filter(a => a).length;
+    let palette = '';
+    quiz.questions.forEach((qq, i) => {
+        const a = quiz.answers[i];
+        let cls = 'qnum';
+        if(i === quiz.idx) cls += ' current';
+        if(a){ cls += ' answered'; cls += a.correct ? ' correct' : ' incorrect'; }
+        palette += `<div class='${cls}' onclick='goToCaseQ(${i})'>${i+1}</div>`;
+    });
+    let optsHtml = '';
+    q[1].forEach((o, i) => {
+        let cls = 'option'; let disabled = '';
+        if(answered){ disabled = 'disabled'; if(i === q[2]) cls += ' correct'; if(i === answered.selected && answered.selected !== q[2]) cls += ' incorrect'; }
+        optsHtml += `<button class='${cls}' ${disabled} onclick='selectCaseOption(${i})'>${String.fromCharCode(65+i)}. ${o}</button>`;
+    });
+    let fbHtml = '';
+    if(answered){
+        fbHtml = answered.correct
+            ? `<div class='feedback good'><b>✓ Correct!</b><div class='working'><b>Working:</b><br>${q[3]}</div></div>`
+            : `<div class='feedback bad'><b>✗ Incorrect.</b> Correct: <b>${String.fromCharCode(65+q[2])}. ${q[1][q[2]]}</b><div class='working'><b>Working:</b><br>${q[3]}</div></div>`;
+    }
+    document.getElementById('main').innerHTML = `
+        <h2>${quiz.title}</h2>
+        <div class='card lesson'><h3>📖 Scenario</h3>${quiz.scenario}</div>
+        <div class='qmeta'>
+            <span class='badge'>Sub-Q ${quiz.idx+1}/${quiz.questions.length}</span>
+            <span class='badge success'>Score: ${score}/${attempted}</span>
+        </div>
+        <div class='card'>
+            <h3>Question Palette</h3>
+            <div class='qpalette'>${palette}</div>
+        </div>
+        <div class='card'>
+            <div class='lesson'><b>${q[0]}</b></div>
+            <div id='opts'>${optsHtml}</div>
+            ${fbHtml}
+            <div class='qnav'>
+                <div class='qnav-left'>
+                    <button class='act secondary' onclick='prevCaseQ()' ${quiz.idx===0?'disabled':''}>← Prev</button>
+                </div>
+                <div class='qnav-right'>
+                    <button class='act warning' onclick='abortQuiz()'>Exit</button>
+                    <button class='act primary' onclick='nextCaseQ()' ${quiz.idx===quiz.questions.length-1?'disabled':''}>Next →</button>
+                    <button class='act success' onclick='finishCaseQuiz()'>🏁 Finish</button>
+                </div>
+            </div>
+        </div>`;
+    window.scrollTo(0,0);
+}
+function selectCaseOption(i){ if(quiz.answers[quiz.idx]) return; const q = quiz.questions[quiz.idx]; quiz.answers[quiz.idx] = { selected: i, correct: (i === q[2]) }; saveState(); showCaseQuestion(); }
+function goToCaseQ(i){ quiz.idx = i; showCaseQuestion(); }
+function prevCaseQ(){ if(quiz.idx>0){ quiz.idx--; showCaseQuestion(); } }
+function nextCaseQ(){ if(quiz.idx<quiz.questions.length-1){ quiz.idx++; showCaseQuestion(); } }
+function finishCaseQuiz(){ const un = quiz.answers.filter(a => !a).length; if(un>0){ if(!confirm(`${un} unanswered. Finish?`)) return; } showResult(); }
+
+// ========== MOBILE-FRIENDLY MATCHING (TAP-TO-MATCH) ==========
+let currentMatching = null;
+let matchState = {}; // slot index -> value
+let selectedMatchItem = null; // currently selected item to place
+function showMatching(){
+    let h = `<h2>🔀 Matching Exercises</h2><div class='card'><p><b>How to use (mobile-friendly):</b><br>1. Tap an item on the right to select it (highlighted purple).<br>2. Tap a slot on the left to place it.<br>3. Tap a filled slot to clear it.</p></div>`;
+    DATA.matching.forEach((m, i) => {
+        h += `<div class='card'><h3>${m.title}</h3><p>${m.pairs.length} items</p><button class='act primary' onclick='startMatching(${i})'>▶ Start</button></div>`;
+    });
+    document.getElementById('main').innerHTML = h;
+}
+function startMatching(idx){
+    currentMatching = DATA.matching[idx];
+    matchState = {};
+    selectedMatchItem = null;
+    renderMatching();
+}
+function renderMatching(){
+    const shuffled = currentMatching._shuffled = currentMatching._shuffled || shuffle(currentMatching.pairs.map(p => p[1]));
+    let leftHtml = '', rightHtml = '';
+    currentMatching.pairs.forEach((p, i) => {
+        const placed = matchState[i];
+        leftHtml += `<div style='padding:10px;background:var(--card);border-radius:8px;margin:8px 0;border:1px solid var(--border)'><b>${p[0]}</b><div class='match-slot' data-idx='${i}' onclick='slotClick(${i})'>${placed || 'Tap here to place selected item'}</div></div>`;
+    });
+    shuffled.forEach((item, i) => {
+        const used = Object.values(matchState).includes(item);
+        const isSel = selectedMatchItem === item;
+        rightHtml += `<div class='match-item ${used?"used":""} ${isSel?"selected":""}' onclick='itemClick("${item.replace(/"/g,"&quot;")}")'>${item}</div>`;
+    });
+    document.getElementById('main').innerHTML = `
+        <h2>${currentMatching.title}</h2>
+        <div class='card'><p><b>Instructions:</b> Tap an item on right → then tap slot on left to place. Tap filled slot to clear.</p></div>
+        <div class='matching-grid'>
+            <div class='match-col'><h4>📌 Items</h4>${leftHtml}</div>
+            <div class='match-col'><h4>🎯 Definitions</h4>${rightHtml}</div>
+        </div>
+        <div class='actions'>
+            <button class='act primary' onclick='checkMatching()'>✓ Check Answers</button>
+            <button class='act warning' onclick='clearMatching()'>🔄 Clear All</button>
+            <button class='act secondary' onclick='showMatching()'>← Back</button>
+        </div>`;
+    window.scrollTo(0,0);
+}
+function itemClick(item){
+    if(Object.values(matchState).includes(item)) return; // already placed
+    selectedMatchItem = selectedMatchItem === item ? null : item;
+    renderMatching();
+}
+function slotClick(idx){
+    if(matchState[idx]){
+        // Clear this slot
+        delete matchState[idx];
+        renderMatching();
+        return;
+    }
+    if(selectedMatchItem){
+        matchState[idx] = selectedMatchItem;
+        selectedMatchItem = null;
+        renderMatching();
+    } else {
+        alert('First tap an item from the right column to select it.');
+    }
+}
+function clearMatching(){ matchState = {}; selectedMatchItem = null; renderMatching(); }
+function checkMatching(){
+    let correct = 0;
+    let feedback = '<div style="margin-top:12px">';
+    currentMatching.pairs.forEach((p, i) => {
+        if(matchState[i] === p[1]) { correct++; feedback += `<div style='padding:8px;margin:4px 0;background:var(--success-bg);border-radius:6px'>✓ ${p[0]} → ${p[1]}</div>`; }
+        else feedback += `<div style='padding:8px;margin:4px 0;background:var(--danger-bg);border-radius:6px'>✗ ${p[0]} → Correct: <b>${p[1]}</b>${matchState[i]?' | Your answer: '+matchState[i]:' | Not answered'}</div>`;
+    });
+    feedback += '</div>';
+    const pct = Math.round(correct / currentMatching.pairs.length * 100);
+    const msg = pct >= 80 ? '🎉 Excellent!' : pct >= 60 ? '👍 Good.' : '📚 Try again.';
+    document.getElementById('main').innerHTML = `
+        <h2>${currentMatching.title} — Result</h2>
+        <div class='card gradient'>
+            <div class='stat-num' style='color:white'>${correct}/${currentMatching.pairs.length} (${pct}%)</div>
+            <p style='color:white;margin-top:8px'>${msg}</p>
+        </div>
+        <div class='card'><h3>Answers</h3>${feedback}</div>
+        <div class='actions'>
+            <button class='act primary' onclick='startMatching(DATA.matching.indexOf(currentMatching))'>🔄 Try Again</button>
+            <button class='act secondary' onclick='showMatching()'>← Back</button>
+        </div>`;
+    delete currentMatching._shuffled;
+}
+
+function closeModal(){ document.getElementById('modal').classList.remove('on'); }
+function resetProgress(){
+    if(!confirm('Reset ALL progress, scores, and bookmarks?')) return;
+    state = { completed:{}, bookmarks:[], scores:{} };
+    saveState();
+    renderNav();
+    showHome();
+}
+
+renderNav();
+showHome();
+</script>
+</body>
+</html>
