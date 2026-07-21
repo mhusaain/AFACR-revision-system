@@ -130,6 +130,179 @@ h2{font-size:18px;}
 .qnav-left,.qnav-right{width:100%;justify-content:stretch;}
 .qnav button{flex:1;}
 }
+  
+/* =============================*===========================
+   MOB*LE HEADER FIX - AFACR REVISION SYS*EM
+   Paste this just ABOVE </styl*>
+================================*======================== */
+
+heade* {
+  padding-top: calc(12px + env(*afe-area-inset-top)) !important;
+ *overflow: hidden !important;
+}
+
+.h*ader-left {
+  min-width: 0 !import*nt;
+  flex: 1 1 auto !important;
+}*
+.header-info {
+  min-width: 0 !im*ortant;
+  overflow: hidden !import*nt;
+}
+
+.header-info h1 {
+  max-wid*h: 100% !important;
+  overflow: hi*den !important;
+  text-overflow: e*lipsis !important;
+}
+
+.header-info*.prepared {
+  max-width: 100% !imp*rtant;
+  overflow: hidden !importa*t;
+  text-overflow: ellipsis !impo*tant;
+}
+
+.controls {
+  flex-shrink* 0 !important;
+}
+
+/* =============*================
+   PHONE / MOBILE*VIEW FIX
+=========================*==== */
+@media (max-width: 900px) *
+  header {
+    display: grid !imp*rtant;
+    grid-template-columns: *4px 44px minmax(0, 1fr) !important*
+    align-items: center !importan*;
+    gap: 10px !important;
+    pa*ding: calc(10px + env(safe-area-in*et-top)) 10px 10px !important;
+  }*
+  .header-left {
+    display: con*ents !important;
+  }
+
+  .hamburger*{
+    display: flex !important;
+  * grid-column: 1 !important;
+    wi*th: 42px !important;
+    height: 4*px !important;
+    min-width: 42px*!important;
+    min-height: 42px !*mportant;
+    border-radius: 12px *important;
+  }
+
+  .logo-icon {
+   *grid-column: 2 !important;
+    wid*h: 42px !important;
+    height: 42*x !important;
+    min-width: 42px *important;
+    min-height: 42px !i*portant;
+    border-radius: 12px !*mportant;
+  }
+
+  .header-info {
+  * grid-column: 3 !important;
+    mi*-width: 0 !important;
+    overflow* hidden !important;
+  }
+
+  .header*info h1 {
+    font-size: 15px !imp*rtant;
+    line-height: 1.2 !impor*ant;
+    white-space: nowrap !impo*tant;
+    overflow: hidden !import*nt;
+    text-overflow: ellipsis !i*portant;
+  }
+
+  .header-info .prep*red {
+    font-size: 10.5px !impor*ant;
+    line-height: 1.25 !import*nt;
+    margin-top: 2px !important*
+    white-space: nowrap !importan*;
+    overflow: hidden !important;*    text-overflow: ellipsis !important;
+    display: block !important;
+  }
+
+  .header-info .prepared .icon {
+    display: none !important;
+  }
+
+  .controls {
+    grid-column: 1 / -1 !important;
+    width: 100% !important;
+    display: flex !important;
+    flex-wrap: nowrap !important;
+    overflow-x: auto !important;
+    overflow-y: hidden !important;
+    gap: 8px !important;
+    padding-top: 8px !important;
+    scrollbar-width: none !important;
+    -ms-overflow-style: none !important;
+  }
+
+  .controls::-webkit-scrollbar {
+    display: none !important;
+  }
+
+  .controls button {
+    flex: 0 0 42px !important;
+    width: 42px !important;
+    height: 42px !important;
+    min-height: 42px !important;
+    padding: 0 !important;
+    justify-content: center !important;
+    border-radius: 12px !important;
+  }
+
+  .controls button span:not(.icon) {
+    display: none !important;
+  }
+
+  .layout {
+    margin-top: 12px !important;
+  }
+}
+
+/* ==============================
+   SMALL PHONES FIX
+============================== */
+@media (max-width: 420px) {
+  header {
+    grid-template-columns: 40px 40px minmax(0, 1fr) !important;
+    gap: 8px !important;
+    padding-left: 8px !important;
+    padding-right: 8px !important;
+  }
+
+  .hamburger,
+  .logo-icon {
+    width: 40px !important;
+    height: 40px !important;
+    min-width: 40px !important;
+    min-height: 40px !important;
+  }
+
+  .header-info h1 {
+    font-size: 14px !important;
+  }
+
+  .header-info .prepared {
+    font-size: 10px !important;
+  }
+
+  .controls {
+    gap: 7px !important;
+    padding-top: 8px !important;
+  }
+
+  .controls button {
+    flex-basis: 40px !important;
+    width: 40px !important;
+    height: 40px !important;
+    min-height: 40px !important;
+  }
+}
+
 </style>
 </head>
 <body>
